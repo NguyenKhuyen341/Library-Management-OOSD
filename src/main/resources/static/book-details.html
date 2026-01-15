@@ -86,7 +86,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('id');
 
- async function loadBookDetails() {
+async function loadBookDetails() {
         if (!bookId) {
             Swal.fire('Lỗi', 'Không tìm thấy ID sách!', 'error').then(() => window.location.href = 'index.html');
             return;
@@ -98,38 +98,40 @@
 
             const book = await res.json();
 
-            // 1. Điền các thông tin cơ bản
+            // Điền thông tin chữ
             document.title = book.title + " - UniLib";
             document.getElementById('book-title').innerText = book.title;
-            // Hiển thị tên tác giả thật (lấy từ object Author)
             document.getElementById('book-author').innerText = "Tác giả: " + (book.author ? book.author.fullName : "Chưa rõ");
             document.getElementById('book-year').innerText = book.publishYear || "2024";
 
-            // 2. (BƯỚC 5) HIỂN THỊ MÔ TẢ THẬT
+            // Điền mô tả
             const descBox = document.querySelector('.synopsis-box p');
             descBox.innerText = book.description || "Chưa có mô tả chi tiết cho cuốn sách này.";
 
-            // 3. Xử lý tồn kho
+            // Xử lý tồn kho (Giữ nguyên)
             const stockEl = document.getElementById('stock-badge');
             const btn = document.getElementById('btn-borrow-main');
-
             if (book.availableQuantity > 0) {
                 stockEl.innerText = `✅ Còn ${book.availableQuantity} cuốn trong kho`;
                 stockEl.className = 'badge-stock';
-                stockEl.style.background = '#dcfce7';
-                stockEl.style.color = '#166534';
+                stockEl.style.background = '#dcfce7'; stockEl.style.color = '#166534';
             } else {
                 stockEl.innerText = `❌ Tạm hết hàng`;
-                stockEl.style.background = '#fee2e2';
-                stockEl.style.color = '#991b1b';
-                btn.disabled = true;
-                btn.innerText = "Tạm hết sách";
-                btn.classList.remove("btn-primary");
-                btn.classList.add("btn-secondary");
+                stockEl.style.background = '#fee2e2'; stockEl.style.color = '#991b1b';
+                btn.disabled = true; btn.innerText = "Tạm hết sách";
+                btn.classList.remove("btn-primary"); btn.classList.add("btn-secondary");
             }
 
-            // 4. Ảnh bìa (Vẫn đang dùng ảnh giả, sẽ sửa ở giai đoạn sau)
-            document.getElementById('book-img').src = `https://ui-avatars.com/api/?name=${book.title}&background=random&size=500&font-size=0.33&length=2`;
+            // --- LOGIC MỚI: HIỂN THỊ ẢNH BÌA THẬT ---
+            const imgEl = document.getElementById('book-img');
+            if (book.image && book.image.trim() !== "") {
+                imgEl.src = `/images/${book.image}`;
+            } else {
+                imgEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=500&font-size=0.33&length=2`;
+            }
+            // Thêm style cho đẹp
+            imgEl.style.objectFit = "cover";
+            // -----------------------------------------
 
         } catch (e) {
             console.error(e);

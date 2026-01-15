@@ -97,6 +97,12 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="fw-bold small text-muted">Ảnh bìa sách</label>
+                        <input type="file" id="bookImage" class="form-control" accept="image/*">
+                        <small class="text-muted">Chấp nhận: .jpg, .png, .jpeg</small>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="fw-bold small text-muted">Mô tả / Tóm tắt</label>
                         <textarea id="description" class="form-control" rows="3" placeholder="Nhập nội dung tóm tắt sách..."></textarea>
                     </div>
@@ -131,7 +137,7 @@
     let bookModalInstance = null;
 
     // 1. Tải danh sách
-    async function loadBooks() {
+  async function loadBooks() {
         try {
             const res = await fetch('/api/books');
             const books = await res.json();
@@ -145,14 +151,25 @@
             books.forEach(book => {
                 let badgeClass = book.availableQuantity > 0 ? 'status-success' : 'status-danger';
                 let badgeText = book.availableQuantity > 0 ? `Còn ${book.availableQuantity} cuốn` : 'Hết hàng';
-                let coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=100&font-size=0.33`;
+
+                // --- BẮT ĐẦU SỬA ĐOẠN NÀY ---
+                // Logic: Kiểm tra xem sách có file ảnh (book.image) không?
+                let coverImg = '';
+                if (book.image && book.image.trim() !== "") {
+                    // Nếu có -> Dùng đường dẫn thật (/images/tên_file)
+                    coverImg = `/images/${book.image}`;
+                } else {
+                    // Nếu không -> Dùng ảnh giả (ui-avatars)
+                    coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=100&font-size=0.33`;
+                }
+                // --- KẾT THÚC SỬA ---
 
                 tbody.innerHTML += `
                     <tr>
                         <td class="text-muted">#${book.id}</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <img src="${coverImg}" class="book-cover-thumb me-3">
+                                <img src="${coverImg}" class="book-cover-thumb me-3" style="object-fit: cover;">
                                 <div>
                                     <div class="fw-bold text-dark">${book.title}</div>
                                     <small class="text-muted">${book.category || 'Chưa phân loại'}</small>
@@ -205,55 +222,70 @@
     }
 
     // 3. Lưu Sách (Đã sửa logic lấy Tên Tác Giả thay vì ID)
-    async function saveBook() {
+async function saveBook() {
+        // Lấy dữ liệu
         const title = document.getElementById('title').value;
         const quantity = document.getElementById('quantity').value;
         const price = document.getElementById('price').value;
         const category = document.getElementById('category').value;
-
-        // --- LẤY DỮ LIỆU MỚI ---
         const authorName = document.getElementById('authorName').value;
         const description = document.getElementById('description').value;
+        const imageFile = document.getElementById('bookImage').files[0]; // Lấy file ảnh
 
         if(!title || !quantity || !price || !category || !authorName) {
             Swal.fire('Thiếu thông tin', 'Vui lòng điền đầy đủ các trường!', 'warning');
             return;
         }
 
-        const bookData = {
-            title: title,
-            totalQuantity: parseInt(quantity),
-            price: parseFloat(price),
-            category: category,
-            description: description,
-            // Gửi object author chứa tên (Backend tự xử lý tìm/tạo)
-            author: { fullName: authorName }
-        };
+        // --- DÙNG FORMDATA ĐỂ GỬI FILE ---
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('quantity', quantity);
+        formData.append('price', price);
+        formData.append('category', category);
+        formData.append('authorName', authorName);
+        formData.append('description', description);
+
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
 
         let url = '/api/books';
-        let method = 'POST';
+        let method = 'POST'; // Mặc định là Thêm mới
+
         if (currentEditingId) {
             url = `/api/books/${currentEditingId}`;
             method = 'PUT';
         }
 
+        // Hiệu ứng nút bấm
+        const btn = event.target;
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải lên...';
+        btn.disabled = true;
+
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookData)
+                // LƯU Ý: Khi gửi FormData, KHÔNG cần set Header 'Content-Type'
+                body: formData
             });
 
             if (res.ok) {
-                const modalEl = document.getElementById('addBookModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if(modal) modal.hide();
-
-                Swal.fire({ icon: 'success', title: 'Thành công!', timer: 1500, showConfirmButton: false });
+                bootstrap.Modal.getInstance(document.getElementById('addBookModal')).hide();
+                Swal.fire('Thành công!', 'Đã lưu sách và ảnh bìa.', 'success');
                 loadBooks();
                 resetForm();
-            } else { Swal.fire('Lỗi', 'Không thể lưu sách', 'error'); }
-        } catch (e) { Swal.fire('Lỗi Server', '', 'error'); }
+            } else {
+                Swal.fire('Lỗi', 'Không thể lưu sách.', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Lỗi Server', 'Không kết nối được.', 'error');
+        } finally {
+            btn.innerHTML = oldText;
+            btn.disabled = false;
+        }
     }
 
     function deleteBook(id) {

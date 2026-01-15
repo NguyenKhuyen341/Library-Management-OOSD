@@ -150,8 +150,9 @@
         if (e.key === 'Enter') doSearch();
     });
 
-    async function fetchBooks(keyword = '') {
+   async function fetchBooks(keyword = '') {
         const listDiv = document.getElementById('book-list');
+        // Hiển thị loading
         listDiv.innerHTML = `
             <div class="text-center w-100 py-5">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -178,7 +179,17 @@
 
             books.forEach(book => {
                 const isAvailable = book.availableQuantity > 0;
-                const coverImg = `https://ui-avatars.com/api/?name=${book.title}&background=random&size=300&font-size=0.33&length=2`;
+
+                // --- BẮT ĐẦU SỬA: LOGIC HIỂN THỊ ẢNH THẬT ---
+                let coverImg = '';
+                if (book.image && book.image.trim() !== "") {
+                    // Nếu có ảnh thật trong DB -> Dùng ảnh thật
+                    coverImg = `/images/${book.image}`;
+                } else {
+                    // Nếu không -> Dùng ảnh giả (Avatar)
+                    coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=300&font-size=0.33&length=2`;
+                }
+                // --- KẾT THÚC SỬA ---
 
                 const badge = isAvailable
                     ? `<span class="book-badge badge-stock"><i class="fas fa-check-circle me-1"></i>Còn ${book.availableQuantity}</span>`
@@ -188,12 +199,13 @@
                     ? `<button onclick="borrowBook(${book.id})" class="btn-borrow"><i class="fas fa-cart-plus me-2"></i>Mượn Ngay</button>`
                     : `<button class="btn-borrow text-muted" disabled>Tạm Hết</button>`;
 
+                // Lưu ý: Đã thêm style="object-fit: cover" vào thẻ img để ảnh đẹp hơn
                 const html = `
                     <div class="col">
                         <div class="book-card">
                             ${badge}
                             <a href="book-details.html?id=${book.id}" class="card-img-wrapper">
-                                <img src="${coverImg}" class="book-img" alt="Bìa sách">
+                                <img src="${coverImg}" class="book-img" alt="Bìa sách" style="object-fit: cover;">
                             </a>
                             <div class="card-body">
                                 <h5 class="book-title" title="${book.title}">
