@@ -20,9 +20,13 @@
         .nav-link i { margin-right: 12px; width: 20px; text-align: center; }
         .brand-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 40px; display: flex; align-items: center; }
         .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+
+        /* BADGE STATUS */
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .status-borrowing { background-color: #e0e7ff; color: #4338ca; }
-        .status-returned { background-color: #dcfce7; color: #166534; }
+        .status-borrowing { background-color: #e0e7ff; color: #4338ca; } /* Xanh dương */
+        .status-returned { background-color: #dcfce7; color: #166534; } /* Xanh lá */
+        .status-pending { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; } /* Vàng (Mới) */
+
         .stat-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -31,7 +35,7 @@
 <div class="sidebar">
     <div class="brand-logo"><i class="fas fa-layer-group me-2"></i> UniLib</div>
     <nav class="nav flex-column">
-        <a class="nav-link" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a class="nav-link" href="admin.html"><i class="fas fa-th-large"></i> Dashboard</a>
         <a class="nav-link" href="admin.html"><i class="fas fa-book"></i> Quản lý Sách</a>
         <a class="nav-link" href="users.html"><i class="fas fa-users"></i> Độc giả</a>
         <a class="nav-link active" href="loans.html"><i class="fas fa-clipboard-list"></i> Mượn Trả</a>
@@ -54,6 +58,12 @@
 
     <div class="row mb-4">
         <div class="col-md-3">
+            <div class="stat-card border-warning" style="border-left-color: #eab308 !important;">
+                <h6 class="text-uppercase text-muted small fw-bold">Chờ lấy sách</h6>
+                <h2 class="fw-bold text-warning m-0" id="count-pending">0</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="stat-card border-primary">
                 <h6 class="text-uppercase text-muted small fw-bold">Đang mượn</h6>
                 <h2 class="fw-bold text-primary m-0" id="count-borrowing">0</h2>
@@ -71,10 +81,10 @@
         <table class="table table-hover align-middle">
             <thead class="bg-light">
             <tr class="text-secondary small text-uppercase">
-                <th>ID Phiếu</th>
+                <th>ID</th>
                 <th>Người mượn</th>
-                <th>Sách mượn</th>
-                <th>Ngày mượn</th>
+                <th>Sách</th>
+                <th>Ngày hẹn/mượn</th>
                 <th>Hạn trả</th>
                 <th>Trạng thái</th>
                 <th class="text-end">Hành động</th>
@@ -87,10 +97,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Hàm format ngày tháng cho đẹp (Năm-Tháng-Ngày)
     function formatDate(dateString) {
-        if (!dateString) return '';
-        return dateString; // Backend trả về YYYY-MM-DD là chuẩn rồi
+        if (!dateString) return '---';
+        return dateString;
     }
 
     async function loadLoans() {
@@ -101,33 +110,55 @@
             const tbody = document.getElementById('loan-table-body');
             tbody.innerHTML = '';
 
-            let countBorrowing = 0;
-            let countReturned = 0;
+            let cPending = 0, cBorrowing = 0, cReturned = 0;
 
             loans.forEach(loan => {
-                const isBorrowing = loan.status === 'BORROWING';
-                if (isBorrowing) countBorrowing++; else countReturned++;
+                let statusBadge = '';
+                let actionBtn = '';
+                let dateDisplay = loan.borrowDate; // Ngày hiển thị
 
-                const statusBadge = isBorrowing
-                    ? `<span class="status-badge status-borrowing">Đang mượn</span>`
-                    : `<span class="status-badge status-returned">Đã trả</span>`;
+                // --- 1. LOGIC TRẠNG THÁI ---
+                if (loan.status === 'PENDING') {
+                    cPending++;
+                    statusBadge = `<span class="status-badge status-pending">Chờ lấy sách</span>`;
+                    // Nút Giao Sách
+                    actionBtn = `<button class="btn btn-sm btn-primary fw-bold" onclick="approveLoan(${loan.id}, '${loan.reader.fullName}')">
+                                    <i class="fas fa-check-double me-1"></i> Giao sách
+                                 </button>`;
+                }
+                else if (loan.status === 'BORROWING') {
+                    cBorrowing++;
+                    statusBadge = `<span class="status-badge status-borrowing">Đang mượn</span>`;
+                    // Nút Trả Sách
+                    actionBtn = `<button class="btn btn-sm btn-outline-success fw-bold" onclick="returnBook(${loan.id}, '${loan.book.title}', '${loan.reader.fullName}')">
+                                    <i class="fas fa-undo me-1"></i> Trả sách
+                                 </button>`;
+                }
+                else {
+                    cReturned++;
+                    statusBadge = `<span class="status-badge status-returned">Đã trả</span>`;
+                    actionBtn = `<span class="text-muted small"><i class="fas fa-check"></i> Hoàn tất</span>`;
+                }
 
-                // Nút bấm: Nếu đang mượn thì hiện nút "Trả sách", nếu trả rồi thì hiện "Hoàn tất"
-                const actionBtn = isBorrowing
-                    ? `<button class="btn btn-sm btn-outline-primary fw-bold" onclick="returnBook(${loan.id}, '${loan.book.title}', '${loan.reader.fullName}')">
-                        <i class="fas fa-undo me-1"></i> Trả sách
-                       </button>`
-                    : `<span class="text-muted small"><i class="fas fa-check"></i> Hoàn tất</span>`;
+                // --- 2. LOGIC ẢNH THẬT ---
+                const book = loan.book;
+                let coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random`;
+                if(book.image && book.image.trim() !== "") coverImg = `/images/${book.image}`;
 
                 const row = `
                     <tr>
                         <td class="text-muted">#${loan.id}</td>
                         <td>
                             <div class="fw-bold">${loan.reader ? loan.reader.fullName : 'Unknown'}</div>
-                            <div class="small text-muted">Mã: ${loan.reader ? loan.reader.readerCode : '---'}</div>
+                            <div class="small text-muted">${loan.reader ? loan.reader.readerCode : '---'}</div>
                         </td>
-                        <td class="fw-bold text-primary">${loan.book ? loan.book.title : 'Unknown'}</td>
-                        <td>${formatDate(loan.borrowDate)}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="${coverImg}" class="rounded me-2 border" width="30" height="40" style="object-fit: cover;">
+                                <div class="fw-bold text-dark text-truncate" style="max-width: 150px;" title="${book.title}">${book.title}</div>
+                            </div>
+                        </td>
+                        <td>${formatDate(dateDisplay)}</td>
                         <td class="fw-bold">${formatDate(loan.dueDate)}</td>
                         <td>${statusBadge}</td>
                         <td class="text-end">${actionBtn}</td>
@@ -137,48 +168,63 @@
             });
 
             // Cập nhật thống kê
-            document.getElementById('count-borrowing').innerText = countBorrowing;
-            document.getElementById('count-returned').innerText = countReturned;
+            document.getElementById('count-pending').innerText = cPending;
+            document.getElementById('count-borrowing').innerText = cBorrowing;
+            document.getElementById('count-returned').innerText = cReturned;
 
         } catch (e) { console.error(e); }
     }
 
-    // --- HÀM TRẢ SÁCH VỚI POPUP ĐẸP ---
+    // --- HÀM 1: GIAO SÁCH (DUYỆT PENDING -> BORROWING) ---
+    function approveLoan(loanId, readerName) {
+        Swal.fire({
+            title: 'Giao sách cho sinh viên?',
+            text: `Xác nhận ${readerName} đã đến nhận sách? Hạn trả (14 ngày) sẽ bắt đầu tính từ bây giờ.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5',
+            confirmButtonText: 'Xác nhận giao'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/loans/approve/${loanId}`, { method: 'POST' });
+                    if (res.ok) {
+                        Swal.fire('Thành công', 'Đã giao sách!', 'success');
+                        loadLoans();
+                    } else {
+                        Swal.fire('Lỗi', await res.text(), 'error');
+                    }
+                } catch (e) { Swal.fire('Lỗi server', '', 'error'); }
+            }
+        });
+    }
+
+    // --- HÀM 2: TRẢ SÁCH (BORROWING -> RETURNED) ---
     function returnBook(loanId, bookTitle, readerName) {
         Swal.fire({
             title: 'Xác nhận trả sách?',
             html: `Độc giả: <b>${readerName}</b><br>Sách: <b>${bookTitle}</b>`,
-            icon: 'question',
+            icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#10b981', // Màu xanh lá
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Đồng ý, Đã nhận sách',
-            cancelButtonText: 'Hủy bỏ'
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'Đồng ý, Đã nhận lại'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
                     const res = await fetch(`/api/loans/return/${loanId}`, { method: 'POST' });
-                    const msg = await res.text();
-
                     if (res.ok) {
-                        Swal.fire('Thành công!', 'Sách đã được trả về kho.', 'success');
-                        loadLoans(); // Tải lại bảng
+                        Swal.fire('Thành công!', 'Đã trả sách về kho.', 'success');
+                        loadLoans();
                     } else {
-                        Swal.fire('Lỗi!', msg, 'error');
+                        Swal.fire('Lỗi!', await res.text(), 'error');
                     }
-                } catch (e) {
-                    Swal.fire('Lỗi!', 'Không thể kết nối Server', 'error');
-                }
+                } catch (e) { Swal.fire('Lỗi!', 'Lỗi server', 'error'); }
             }
         });
     }
 
     function openLoanModal() {
-        Swal.fire({
-            title: 'Chức năng này',
-            text: 'Admin nên dùng ô Tìm kiếm ở Trang chủ để mượn sách cho nhanh nhé!',
-            icon: 'info'
-        });
+        Swal.fire('Thông báo', 'Admin vui lòng thao tác trên bảng bên dưới.', 'info');
     }
 
     loadLoans();

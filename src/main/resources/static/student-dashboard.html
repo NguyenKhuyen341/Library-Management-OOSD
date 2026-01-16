@@ -5,91 +5,140 @@
     <title>Hồ Sơ Của Tôi - UniLib</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .sidebar { background: white; border-radius: 16px; padding: 25px; height: 100%; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .user-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 4px solid #eef2ff; }
-        .menu-item { display: block; padding: 12px 20px; color: #64748b; text-decoration: none; border-radius: 10px; font-weight: 600; margin-bottom: 5px; transition: 0.2s; cursor: pointer; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* HEADER & FOOTER */
+        .navbar-glass { background: white; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+        footer { background: #0f172a; color: #94a3b8; margin-top: auto; padding: 50px 0 20px; }
+        footer a { color: #cbd5e1; text-decoration: none; transition: 0.2s; }
+        footer a:hover { color: #fff; text-decoration: underline; }
+
+        /* SIDEBAR */
+        .sidebar-card { background: white; border-radius: 16px; padding: 30px 20px; border: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); text-align: center; }
+        .user-avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 4px solid #eef2ff; }
+        .menu-item { display: flex; align-items: center; padding: 12px 20px; color: #64748b; text-decoration: none; border-radius: 12px; font-weight: 600; margin-bottom: 8px; transition: 0.2s; cursor: pointer; }
         .menu-item:hover, .menu-item.active { background: #eef2ff; color: #4f46e5; }
-        .card-custom { background: white; border-radius: 16px; border: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
-        .badge-borrowing { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .badge-returned { background: #ecfdf5; color: #047857; border: 1px solid #d1fae5; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        /* STATS CARDS */
+        .stat-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        /* Màu sắc icon thống kê */
+        .bg-icon-pending { background: #fef9c3; color: #854d0e; } /* Vàng - Chờ lấy */
+        .bg-icon-borrowing { background: #e0e7ff; color: #4338ca; } /* Xanh - Đang mượn */
+        .bg-icon-returned { background: #dcfce7; color: #15803d; } /* Lục - Đã trả */
+
+        .main-box { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); overflow: hidden; min-height: 400px; }
+
+        /* BADGES TRẠNG THÁI */
+        .badge-pending { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge-borrowing { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge-returned { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top mb-5">
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="index.html">UniLib.</a>
+        <a class="navbar-brand fw-bold text-primary fs-4" href="index.html"><i class="fas fa-book-reader me-2"></i>UniLib.</a>
         <div class="d-flex align-items-center gap-3">
-            <span class="text-muted small">Xin chào, <b id="header-name">Student</b></span>
-            <a href="index.html" class="btn btn-sm btn-outline-secondary">Về trang chủ</a>
+            <a href="index.html" class="btn btn-light rounded-pill btn-sm px-3 fw-bold text-muted"><i class="fas fa-arrow-left me-2"></i>Về trang chủ</a>
+            <div class="dropdown">
+                <button class="btn btn-light border rounded-pill py-1 px-2 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                    <img src="" id="header-avatar" class="rounded-circle" width="32" height="32">
+                    <span class="fw-bold small d-none d-sm-inline" id="header-name">Student</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" style="border-radius: 12px;">
+                    <li><button class="dropdown-item rounded-2 active"><i class="fas fa-user-circle me-2"></i>Hồ sơ của tôi</button></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item rounded-2 text-danger fw-bold" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</button></li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="container py-5">
     <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="sidebar text-center">
-                <img src="" id="user-img" class="user-avatar">
-                <h5 class="fw-bold mb-1" id="profile-name">Loading...</h5>
-                <p class="text-muted small mb-4" id="profile-code">---</p>
+        <div class="col-lg-3 mb-4">
+            <div class="sidebar-card">
+                <img src="" id="user-img" class="user-avatar-lg">
+                <h5 class="fw-bold mb-1" id="profile-name">...</h5>
+                <p class="text-muted small mb-0" id="profile-code">...</p>
+                <div class="mt-2"><span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Thành viên chính thức</span></div>
 
-                <div class="text-start">
-                    <div onclick="switchTab('loans')" class="menu-item active" id="tab-loans"><i class="fas fa-book-reader me-2"></i> Sách đang mượn</div>
+                <div class="menu-list">
+                    <div onclick="switchTab('loans')" class="menu-item active" id="tab-loans"><i class="fas fa-book-open me-2"></i> Quản lý sách mượn</div>
                     <div onclick="switchTab('settings')" class="menu-item" id="tab-settings"><i class="fas fa-user-cog me-2"></i> Cài đặt tài khoản</div>
-                    <hr>
-                    <div onclick="logout()" class="menu-item text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</div>
+                    <div onclick="logout()" class="menu-item text-danger mt-3"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-lg-9">
 
-            <div id="section-loans" class="card-custom mb-4">
-                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0"><i class="fas fa-book me-2 text-primary"></i>Quản lý mượn trả</h5>
-                    <button class="btn btn-primary btn-sm rounded-pill px-3" onclick="location.href='index.html'">
-                        <i class="fas fa-plus me-1"></i> Mượn thêm sách
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-icon-pending"><i class="fas fa-hourglass-half"></i></div>
+                        <div><h3 class="fw-bold mb-0" id="stat-pending">0</h3><div class="small text-muted fw-bold">Chờ lấy sách</div></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-icon-borrowing"><i class="fas fa-book-reader"></i></div>
+                        <div><h3 class="fw-bold mb-0" id="stat-borrowing">0</h3><div class="small text-muted fw-bold">Đang đọc</div></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-icon-returned"><i class="fas fa-check-circle"></i></div>
+                        <div><h3 class="fw-bold mb-0" id="stat-returned">0</h3><div class="small text-muted fw-bold">Đã trả xong</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-loans" class="main-box">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-white">
+                    <div>
+                        <h5 class="fw-bold m-0"><i class="fas fa-clipboard-list me-2 text-primary"></i>Danh sách sách</h5>
+                        <small class="text-muted">Theo dõi trạng thái mượn trả</small>
+                    </div>
+                    <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="location.href='index.html'">
+                        <i class="fas fa-plus me-1"></i> Mượn thêm
                     </button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table mb-0">
-                        <thead class="bg-light">
-                        <tr><th>Sách</th><th>Ngày mượn</th><th>Hạn trả</th><th>Trạng thái</th></tr>
-                        </thead>
+                    <table class="table mb-0 align-middle table-hover">
+                        <thead class="bg-light"><tr><th>Sách</th><th>Ngày ĐK/Mượn</th><th>Hạn trả</th><th>Trạng thái</th></tr></thead>
                         <tbody id="loan-list"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="section-settings" class="card-custom mb-4" style="display: none;">
-                <div class="p-4 border-bottom">
-                    <h5 class="fw-bold m-0"><i class="fas fa-user-edit me-2 text-primary"></i>Cập nhật thông tin</h5>
-                </div>
+            <div id="section-settings" class="main-box" style="display: none;">
+                <div class="p-4 border-bottom"><h5 class="fw-bold m-0">Cập nhật thông tin</h5></div>
                 <div class="p-4">
-                    <form id="updateForm">
-                        <div class="mb-3">
-                            <label class="fw-bold small text-muted">Họ và tên</label>
-                            <input type="text" id="edit-fullname" class="form-control" required>
+                    <form id="updateForm" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold small text-muted mb-1">Họ và tên</label>
+                            <input type="text" id="edit-fullname" class="form-control bg-light" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="fw-bold small text-muted">Số điện thoại</label>
-                            <input type="text" id="edit-phone" class="form-control" placeholder="Nhập số điện thoại...">
+                        <div class="col-md-6">
+                            <label class="fw-bold small text-muted mb-1">Số điện thoại</label>
+                            <input type="text" id="edit-phone" class="form-control bg-light">
                         </div>
-                        <div class="mb-3">
-                            <label class="fw-bold small text-muted">Mật khẩu mới (Để trống nếu không đổi)</label>
-                            <input type="password" class="form-control" placeholder="Tính năng đang phát triển..." disabled>
+                        <div class="col-12 mt-4">
+                            <button type="button" onclick="updateProfile()" class="btn btn-primary fw-bold px-4 rounded-pill">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
                         </div>
-                        <button type="button" onclick="updateProfile()" class="btn btn-primary fw-bold">
-                            <i class="fas fa-save me-2"></i>Lưu thay đổi
-                        </button>
                     </form>
                 </div>
             </div>
@@ -98,123 +147,148 @@
     </div>
 </div>
 
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="text-white fw-bold mb-3">Về UniLib</h5>
+                <p class="small opacity-75">Hệ thống thư viện số hiện đại.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-white fw-bold mb-3">Liên hệ</h5>
+                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> TP.HCM</p>
+                <p class="small"><i class="fas fa-envelope me-2 text-primary"></i> contact@unilib.edu.vn</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <p class="small text-muted">&copy; 2024 UniLib System.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // 1. Kiểm tra đăng nhập
     const userJson = localStorage.getItem('currentUser');
     if (!userJson) window.location.href = 'login.html';
     const user = JSON.parse(userJson);
 
-    // 2. Điền thông tin ban đầu
+    // 2. Điền thông tin Profile
+    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff&size=128`;
     document.getElementById('header-name').innerText = user.fullName;
+    document.getElementById('header-avatar').src = avatarUrl;
     document.getElementById('profile-name').innerText = user.fullName;
-    document.getElementById('profile-code').innerText = user.readerCode || "Mã: Chưa cấp";
-    document.getElementById('user-img').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&size=200`;
-
-    // Điền sẵn vào form Settings
+    document.getElementById('profile-code').innerText = user.readerCode || "Mã: --";
+    document.getElementById('user-img').src = avatarUrl;
     document.getElementById('edit-fullname').value = user.fullName;
     document.getElementById('edit-phone').value = user.phoneNumber || "";
 
-    // --- HÀM CHUYỂN TAB ---
+    // 3. Hàm chuyển Tab
     function switchTab(tabName) {
-        // Ẩn hết
-        document.getElementById('section-loans').style.display = 'none';
-        document.getElementById('section-settings').style.display = 'none';
-
-        // Bỏ active menu
-        document.getElementById('tab-loans').classList.remove('active');
-        document.getElementById('tab-settings').classList.remove('active');
-
-        // Hiện cái cần hiện
-        if (tabName === 'loans') {
-            document.getElementById('section-loans').style.display = 'block';
-            document.getElementById('tab-loans').classList.add('active');
-        } else {
-            document.getElementById('section-settings').style.display = 'block';
-            document.getElementById('tab-settings').classList.add('active');
-        }
+        ['loans', 'settings'].forEach(t => document.getElementById(`section-${t}`).style.display = 'none');
+        ['loans', 'settings'].forEach(t => document.getElementById(`tab-${t}`).classList.remove('active'));
+        document.getElementById(`section-${tabName}`).style.display = 'block';
+        document.getElementById(`tab-${tabName}`).classList.add('active');
     }
 
-    // --- HÀM TẢI DANH SÁCH MƯỢN ---
+    // 4. Tải danh sách mượn (LOGIC ĐƯỢC CẬP NHẬT)
     async function loadMyLoans() {
         const tbody = document.getElementById('loan-list');
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Đang tải...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>';
+
         try {
             const res = await fetch(`/api/loans/my-loans?readerId=${user.readerId}`);
+            if(!res.ok) throw new Error("Lỗi tải dữ liệu");
             const loans = await res.json();
-            tbody.innerHTML = '';
 
+            // --- CẬP NHẬT THỐNG KÊ (HỖ TRỢ 3 TRẠNG THÁI) ---
+            const pending = loans.filter(l => l.status === 'PENDING').length;
+            const borrowing = loans.filter(l => l.status === 'BORROWING').length;
+            const returned = loans.filter(l => l.status === 'RETURNED').length;
+
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-borrowing').innerText = borrowing;
+            document.getElementById('stat-returned').innerText = returned;
+
+            tbody.innerHTML = '';
             if (loans.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">Bạn chưa mượn cuốn sách nào.</td></tr>';
                 return;
             }
-            loans.sort((a, b) => (a.status === 'BORROWING' ? -1 : 1));
-            loans.forEach(loan => {
-                const isBorrowing = loan.status === 'BORROWING';
-                const statusHtml = isBorrowing
-                    ? `<span class="badge-borrowing">Đang mượn</span>`
-                    : `<span class="badge-returned">Đã trả</span>`;
-                const title = loan.book ? loan.book.title : 'Sách đã xóa';
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="fw-bold text-dark">${title}</td>
-                        <td>${loan.borrowDate}</td>
-                        <td class="${isBorrowing ? 'text-danger fw-bold' : ''}">${loan.dueDate}</td>
-                        <td>${statusHtml}</td>
-                    </tr>`;
+            // Sắp xếp: Chờ lấy -> Đang mượn -> Đã trả
+            loans.sort((a, b) => {
+                const order = { 'PENDING': 1, 'BORROWING': 2, 'RETURNED': 3 };
+                return (order[a.status] || 99) - (order[b.status] || 99);
             });
-        } catch (e) { console.error(e); }
+
+            loans.forEach(loan => {
+                let badge = '';
+                let dateDisplay = loan.borrowDate;
+                let dueDateDisplay = loan.dueDate;
+
+                if (loan.status === 'PENDING') {
+                    badge = `<span class="badge-pending">Chờ lấy sách</span>`;
+                    dueDateDisplay = '<span class="text-muted small">Chưa tính</span>';
+                } else if (loan.status === 'BORROWING') {
+                    badge = `<span class="badge-borrowing">Đang mượn</span>`;
+                    dueDateDisplay = `<span class="text-danger fw-bold">${loan.dueDate}</span>`;
+                } else {
+                    badge = `<span class="badge-returned">Đã trả</span>`;
+                    dueDateDisplay = `<span class="text-muted">${loan.dueDate}</span>`;
+                }
+
+                // Xử lý ảnh thật
+                const book = loan.book;
+                let coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random`;
+                if (book.image && book.image.trim() !== "") {
+                    coverImg = `/images/${book.image}`;
+                }
+
+                const row = `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="${coverImg}" class="rounded-3 me-3 border" width="45" height="60" style="object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold text-dark">${book.title}</div>
+                                    <small class="text-muted">${book.author ? book.author.fullName : '---'}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${dateDisplay}</td>
+                        <td>${dueDateDisplay}</td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+        } catch (e) {
+            console.error(e);
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-danger fw-bold">Không tải được dữ liệu! Vui lòng thử lại sau.</td></tr>';
+        }
     }
 
-    // --- HÀM CẬP NHẬT PROFILE ---
     async function updateProfile() {
+        // ... (Giữ nguyên logic update cũ)
         const newName = document.getElementById('edit-fullname').value;
         const newPhone = document.getElementById('edit-phone').value;
-
         try {
             const res = await fetch(`/api/readers/${user.readerId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fullName: newName,
-                    phoneNumber: newPhone
-                })
+                body: JSON.stringify({ fullName: newName, phoneNumber: newPhone })
             });
-
             if (res.ok) {
-                // Cập nhật lại LocalStorage để lần sau vào web nó nhớ tên mới
-                user.fullName = newName;
-                user.phoneNumber = newPhone;
+                user.fullName = newName; user.phoneNumber = newPhone;
                 localStorage.setItem('currentUser', JSON.stringify(user));
-
-                // Cập nhật giao diện ngay lập tức
-                document.getElementById('header-name').innerText = newName;
-                document.getElementById('profile-name').innerText = newName;
-                document.getElementById('user-img').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=random&size=200`;
-
-                Swal.fire('Thành công', 'Thông tin đã được cập nhật!', 'success');
-            } else {
-                Swal.fire('Lỗi', 'Không thể cập nhật thông tin.', 'error');
-            }
-        } catch (e) {
-            Swal.fire('Lỗi', 'Lỗi kết nối Server', 'error');
-        }
+                location.reload();
+            } else { Swal.fire('Lỗi', 'Không cập nhật được', 'error'); }
+        } catch (e) { Swal.fire('Lỗi', 'Lỗi server', 'error'); }
     }
 
-    function logout() {
-        Swal.fire({
-            title: 'Đăng xuất?',
-            text: "Hẹn gặp lại bạn!",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Đăng xuất',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            }
-        });
-    }
+    function logout() { localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
 
     loadMyLoans();
 </script>

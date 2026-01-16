@@ -6,133 +6,221 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .sidebar { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); height: fit-content; }
-        .cat-link { display: block; padding: 12px 15px; color: #64748b; text-decoration: none; border-radius: 8px; font-weight: 500; transition: 0.2s; margin-bottom: 5px; font-size: 0.95rem; }
-        .cat-link:hover, .cat-link.active { background: #eef2ff; color: #4f46e5; }
-        .book-card { background: white; border-radius: 16px; overflow: hidden; transition: 0.3s; border: 1px solid #e2e8f0; }
-        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .book-img { height: 200px; object-fit: contain; width: 100%; background: #f1f5f9; padding: 20px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Sidebar bên trái */
+        .sidebar { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
+        .cat-link {
+            display: flex; align-items: center; padding: 12px 15px;
+            color: #64748b; text-decoration: none; border-radius: 8px;
+            font-weight: 600; transition: 0.2s; margin-bottom: 5px; cursor: pointer;
+        }
+        .cat-link:hover, .cat-link.active { background-color: #eef2ff; color: #4f46e5; }
+        .cat-link i { width: 25px; text-align: center; margin-right: 10px; }
+
+        /* Card Sách */
+        .book-card { border: none; border-radius: 12px; transition: all 0.3s; background: white; height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; border: 1px solid #f1f5f9; }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .book-img-wrapper { height: 240px; overflow: hidden; position: relative; background: #f8fafc; }
+        .book-img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        .book-card:hover .book-img { transform: scale(1.05); }
+
+        /* Badges (Nhãn trạng thái) */
+        .badge-stock { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); color: #166534; font-size: 0.75rem; font-weight: 700; padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(4px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .badge-out { position: absolute; top: 10px; right: 10px; background: rgba(254, 226, 226, 0.95); color: #991b1b; font-size: 0.75rem; font-weight: 700; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        /* Footer */
+        footer { background: #0f172a; color: #94a3b8; margin-top: auto; padding-top: 50px; padding-bottom: 20px; }
+        footer a { color: #cbd5e1; text-decoration: none; transition: 0.2s; }
+        footer a:hover { color: #fff; text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="index.html">UniLib.</a>
-        <div class="d-flex gap-2">
-            <a href="index.html" class="btn btn-outline-secondary btn-sm">Về trang chủ</a>
+        <a class="navbar-brand fw-bold text-primary fs-4" href="index.html"><i class="fas fa-book-reader me-2"></i>UniLib.</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fw-bold">
+                <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link active text-primary" href="catalog.html">Danh mục</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Sách mới</a></li>
+            </ul>
+
+            <div id="user-actions">
+            </div>
         </div>
     </div>
 </nav>
 
 <div class="container py-5">
     <div class="row">
-        <div class="col-md-3 mb-4">
+        <div class="col-lg-3 mb-4">
             <div class="sidebar">
-                <h5 class="fw-bold mb-3 px-2 text-dark">📚 Thể Loại Sách</h5>
-                <a href="#" class="cat-link active" onclick="filterBooks('ALL', this)">🔄 Tất cả sách</a>
-                <a href="#" class="cat-link" onclick="filterBooks('CNTT', this)">💻 Công nghệ thông tin</a>
-                <a href="#" class="cat-link" onclick="filterBooks('KINHTE', this)">💰 Kinh tế - Quản trị</a>
-                <a href="#" class="cat-link" onclick="filterBooks('NGOAINGU', this)">🌏 Ngoại ngữ</a>
-                <a href="#" class="cat-link" onclick="filterBooks('KYNANG', this)">🌱 Kỹ năng sống</a>
-                <a href="#" class="cat-link" onclick="filterBooks('VANHOC', this)">📖 Văn học - Tiểu thuyết</a>
-                <a href="#" class="cat-link" onclick="filterBooks('KHOAHOC', this)">🔬 Khoa học cơ bản</a>
-                <a href="#" class="cat-link" onclick="filterBooks('DIENTU', this)">⚡ Điện - Điện tử</a>
+                <h6 class="fw-bold mb-3 px-2 text-uppercase text-muted small ls-1">Bộ lọc sách</h6>
+                <a href="#" onclick="filterBooks('ALL', this); return false;" class="cat-link active"><i class="fas fa-layer-group"></i> Tất cả sách</a>
+                <a href="#" onclick="filterBooks('CNTT', this); return false;" class="cat-link"><i class="fas fa-laptop-code"></i> Công nghệ thông tin</a>
+                <a href="#" onclick="filterBooks('KINHTE', this); return false;" class="cat-link"><i class="fas fa-chart-line"></i> Kinh tế - Quản trị</a>
+                <a href="#" onclick="filterBooks('NGOAINGU', this); return false;" class="cat-link"><i class="fas fa-language"></i> Ngoại ngữ</a>
+                <a href="#" onclick="filterBooks('KYNANG', this); return false;" class="cat-link"><i class="fas fa-seedling"></i> Kỹ năng sống</a>
+                <a href="#" onclick="filterBooks('VANHOC', this); return false;" class="cat-link"><i class="fas fa-feather-alt"></i> Văn học - Tiểu thuyết</a>
+                <a href="#" onclick="filterBooks('KHOAHOC', this); return false;" class="cat-link"><i class="fas fa-flask"></i> Khoa học cơ bản</a>
+                <a href="#" onclick="filterBooks('DIENTU', this); return false;" class="cat-link"><i class="fas fa-bolt"></i> Điện - Điện tử</a>
             </div>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-lg-9">
             <div class="bg-white p-4 rounded-4 mb-4 shadow-sm border">
-                <h3 class="fw-bold mb-1" id="cat-title">Tất cả sách</h3>
+                <h3 class="fw-bold mb-2 text-primary" id="cat-title">Tất cả sách</h3>
                 <p class="text-muted m-0" id="cat-desc">Khám phá toàn bộ kho tàng tri thức của thư viện UniLib.</p>
             </div>
 
-            <div class="row row-cols-1 row-cols-md-3 g-4" id="book-list">
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="book-grid">
             </div>
         </div>
     </div>
 </div>
 
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="text-white fw-bold mb-3">Về UniLib</h5>
+                <p class="small">Hệ thống thư viện số hiện đại dành cho sinh viên.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-white fw-bold mb-3">Liên hệ</h5>
+                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 123 Nguyễn Văn Cừ, Q.5, TP.HCM</p>
+                <p class="small"><i class="fas fa-envelope me-2 text-primary"></i> contact@unilib.edu.vn</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <p class="small text-muted">&copy; 2024 UniLib Library System.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Bản đồ thông tin danh mục (Tên + Mô tả)
     const categoryInfo = {
         'ALL': { title: 'Tất cả sách', desc: 'Khám phá toàn bộ kho tàng tri thức của thư viện UniLib.' },
-        'CNTT': { title: 'Công nghệ thông tin', desc: 'Sách lập trình, thuật toán, cơ sở dữ liệu và mạng máy tính.' },
-        'KINHTE': { title: 'Kinh tế - Quản trị', desc: 'Giáo trình kinh tế vĩ mô, marketing, quản trị kinh doanh.' },
-        'NGOAINGU': { title: 'Ngoại ngữ', desc: 'Sách học tiếng Anh, Nhật, Hàn, luyện thi TOEIC/IELTS.' },
-        'KYNANG': { title: 'Kỹ năng sống', desc: 'Sách phát triển bản thân, tư duy, giao tiếp.' },
-        'VANHOC': { title: 'Văn học - Tiểu thuyết', desc: 'Các tác phẩm văn học kinh điển và tiểu thuyết hiện đại.' },
-        'KHOAHOC': { title: 'Khoa học cơ bản', desc: 'Toán cao cấp, Vật lý đại cương, Hóa học.' },
-        'DIENTU': { title: 'Điện - Điện tử', desc: 'Giáo trình mạch điện, vi xử lý, tự động hóa.' }
+        'CNTT': { title: 'Công nghệ thông tin', desc: 'Sách lập trình, thuật toán, cơ sở dữ liệu.' },
+        'KINHTE': { title: 'Kinh tế - Quản trị', desc: 'Kiến thức về kinh tế vĩ mô, marketing, quản trị.' },
+        'NGOAINGU': { title: 'Ngoại ngữ', desc: 'Tài liệu học tiếng Anh, Nhật, Hàn.' },
+        'KYNANG': { title: 'Kỹ năng sống', desc: 'Sách phát triển bản thân, tư duy tích cực.' },
+        'VANHOC': { title: 'Văn học - Tiểu thuyết', desc: 'Những tác phẩm văn học kinh điển.' },
+        'KHOAHOC': { title: 'Khoa học cơ bản', desc: 'Toán học, Vật lý, Hóa học.' },
+        'DIENTU': { title: 'Điện - Điện tử', desc: 'Giáo trình mạch điện, vi xử lý, IoT.' }
     };
 
-    async function filterBooks(category, element) {
-        // 1. Cập nhật giao diện Sidebar (Active)
-        document.querySelectorAll('.cat-link').forEach(el => el.classList.remove('active'));
-        if(element) element.classList.add('active');
-
-        // 2. Cập nhật Tiêu đề & Mô tả ở trên đầu trang
-        const info = categoryInfo[category] || categoryInfo['ALL'];
+    // Hàm Lọc Sách
+    async function filterBooks(categoryCode, element) {
+        if(element) {
+            document.querySelectorAll('.cat-link').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+        const info = categoryInfo[categoryCode] || categoryInfo['ALL'];
         document.getElementById('cat-title').innerText = info.title;
         document.getElementById('cat-desc').innerText = info.desc;
 
-        // 3. Gọi API lấy sách
-        const listDiv = document.getElementById('book-list');
-        listDiv.innerHTML = `
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-muted">Đang tìm sách...</p>
-            </div>`;
+        const grid = document.getElementById('book-grid');
+        grid.innerHTML = `<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">Đang tải...</p></div>`;
 
         try {
             let url = '/api/books';
-            if (category !== 'ALL') {
-                url += `?category=${category}`;
-            }
-
+            if (categoryCode !== 'ALL') url += `?category=${categoryCode}`;
             const res = await fetch(url);
             const books = await res.json();
-
-            listDiv.innerHTML = '';
+            grid.innerHTML = '';
 
             if(books.length === 0) {
-                listDiv.innerHTML = `
-                    <div class="col-12 text-center text-muted py-5">
-                        <i class="fas fa-box-open fs-1 mb-3 opacity-25"></i>
-                        <p>Chưa có cuốn sách nào thuộc thể loại <b>${info.title}</b>.</p>
-                    </div>`;
+                grid.innerHTML = `<div class="col-12 text-center text-muted py-5"><p>Chưa có sách nào trong mục này.</p></div>`;
                 return;
             }
 
             books.forEach(book => {
-                const cover = `https://ui-avatars.com/api/?name=${book.title}&background=random&size=200&font-size=0.33`;
+                let coverImg = (book.image && book.image.trim() !== "") ? `/images/${book.image}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=300`;
+                const isAvailable = book.availableQuantity > 0;
+                const badge = isAvailable ? `<span class="badge-stock">Còn ${book.availableQuantity}</span>` : `<span class="badge-out">Hết hàng</span>`;
+                const btnHtml = isAvailable ? `<button onclick="borrowBook(${book.id})" class="btn btn-primary w-100 fw-bold"><i class="fas fa-cart-plus me-2"></i>Mượn ngay</button>` : `<button class="btn btn-secondary w-100" disabled>Tạm hết hàng</button>`;
+
                 const html = `
                     <div class="col">
-                        <div class="book-card h-100">
-                            <a href="book-details.html?id=${book.id}">
-                                <img src="${cover}" class="book-img">
-                            </a>
-                            <div class="p-3">
-                                <h6 class="fw-bold mb-1 text-truncate" title="${book.title}">${book.title}</h6>
-                                <p class="small text-muted mb-2">${book.author ? book.author.fullName : '---'}</p>
-                                <a href="book-details.html?id=${book.id}" class="btn btn-sm btn-outline-primary w-100">Xem chi tiết</a>
+                        <div class="book-card h-100 d-flex flex-column">
+                            <div class="book-img-wrapper">
+                                ${badge}
+                                <a href="book-details.html?id=${book.id}"><img src="${coverImg}" class="book-img" style="object-fit: cover;"></a>
+                            </div>
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <h6 class="fw-bold text-dark mb-1 text-truncate" title="${book.title}"><a href="book-details.html?id=${book.id}" class="text-decoration-none text-dark">${book.title}</a></h6>
+                                <p class="small text-muted mb-3">${book.author ? book.author.fullName : 'Chưa rõ'}</p>
+                                <div class="mt-auto">${btnHtml}</div>
                             </div>
                         </div>
-                    </div>
-                `;
-                listDiv.innerHTML += html;
+                    </div>`;
+                grid.innerHTML += html;
             });
+        } catch (e) { grid.innerHTML = '<p class="text-danger text-center">Lỗi kết nối Server!</p>'; }
+    }
 
-        } catch (e) {
-            console.error(e);
-            listDiv.innerHTML = '<p class="text-danger text-center">Lỗi tải dữ liệu!</p>';
+    // --- CHECK LOGIN: HIỂN THỊ MENU USER ---
+    function checkLogin() {
+        const userJson = localStorage.getItem('currentUser');
+        const div = document.getElementById('user-actions');
+
+        if(userJson) {
+            const user = JSON.parse(userJson);
+            const ava = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff`;
+
+            // Code HTML Dropdown chuẩn Bootstrap
+            div.innerHTML = `
+                <div class="dropdown">
+                    <button class="btn btn-light border rounded-pill py-1 px-2 d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="${ava}" class="rounded-circle" width="32" height="32">
+                        <span class="fw-bold small d-none d-sm-inline">${user.fullName}</span>
+                        <i class="fas fa-chevron-down small text-muted"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2 shadow border-0">
+                        <li><h6 class="dropdown-header">Xin chào, ${user.fullName}!</h6></li>
+                        <li><a class="dropdown-item" href="student-dashboard.html"><i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ của tôi</a></li>
+                        <li><a class="dropdown-item" href="student-dashboard.html"><i class="fas fa-history me-2 text-info"></i>Lịch sử mượn</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger fw-bold" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>`;
+        } else {
+            div.innerHTML = `<a href="login.html" class="btn btn-primary rounded-pill px-4 fw-bold">Đăng nhập</a>`;
         }
     }
 
-    // Load lần đầu
-    filterBooks('ALL', document.querySelector('.cat-link'));
+    function logout() { localStorage.removeItem('currentUser'); location.reload(); }
+
+    async function borrowBook(bookId) {
+        const userJson = localStorage.getItem('currentUser');
+        if (!userJson) return Swal.fire('Thông báo', 'Vui lòng đăng nhập để mượn sách', 'info').then(() => location.href='login.html');
+        const user = JSON.parse(userJson);
+        Swal.fire({ title: 'Xác nhận mượn?', icon: 'question', showCancelButton: true, confirmButtonText: 'Mượn ngay' }).then(async (r) => {
+            if(r.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/loans/borrow?readerId=${user.readerId}&bookId=${bookId}`, { method: 'POST' });
+                    const msg = await res.text();
+                    if(res.ok) Swal.fire('Thành công', msg, 'success').then(() => filterBooks('ALL'));
+                    else Swal.fire('Thất bại', msg, 'error');
+                } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+            }
+        });
+    }
+
+    checkLogin();
+    filterBooks('ALL', document.querySelector('.cat-link.active'));
 </script>
 
 </body>
