@@ -15,9 +15,9 @@ public class DataInitializer implements CommandLineRunner {
     private final LoanService loanService;
 
     public DataInitializer(ReaderRepository readerRepository,
-                           BookRepository bookRepository,
-                           AuthorRepository authorRepository,
-                           LoanService loanService) {
+                            BookRepository bookRepository,
+                            AuthorRepository authorRepository,
+                            LoanService loanService) {
         this.readerRepository = readerRepository;
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
