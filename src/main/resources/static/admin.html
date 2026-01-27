@@ -86,6 +86,20 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                        <label class="form-label small text-muted fw-bold">NĂM XUẤT BẢN</label>
+                        <input type="number" id="publishYear" class="form-control" placeholder="2024">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label small text-muted fw-bold">SỐ TRANG</label>
+                        <input type="number" id="pageCount" class="form-control" placeholder="350">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label small text-muted fw-bold">NGÔN NGỮ</label>
+                        <input type="text" id="language" class="form-control" placeholder="Tiếng Việt">
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label small text-muted fw-bold">TÊN TÁC GIẢ</label>
                         <input type="text" id="authorName" class="form-control" placeholder="Ví dụ: Nguyễn Nhật Ánh" list="authorSuggestions">
@@ -137,7 +151,7 @@
     let bookModalInstance = null;
 
     // 1. Tải danh sách
-  async function loadBooks() {
+async function loadBooks() {
         try {
             const res = await fetch('/api/books');
             const books = await res.json();
@@ -210,6 +224,9 @@
             // --- CẬP NHẬT MỚI: Điền Tên Tác Giả & Mô tả ---
             document.getElementById('authorName').value = book.author ? book.author.fullName : "";
             document.getElementById('description').value = book.description || "";
+            document.getElementById('publishYear').value = book.publishYear || "";
+            document.getElementById('pageCount').value = book.pageCount || "";
+            document.getElementById('language').value = book.language || "";
             // ----------------------------------------------
 
             currentEditingId = id;
@@ -222,7 +239,7 @@
     }
 
     // 3. Lưu Sách (Đã sửa logic lấy Tên Tác Giả thay vì ID)
-async function saveBook() {
+    async function saveBook() {
         // Lấy dữ liệu
         const title = document.getElementById('title').value;
         const quantity = document.getElementById('quantity').value;
@@ -230,6 +247,9 @@ async function saveBook() {
         const category = document.getElementById('category').value;
         const authorName = document.getElementById('authorName').value;
         const description = document.getElementById('description').value;
+        const publishYear = document.getElementById('publishYear').value;
+        const pageCount = document.getElementById('pageCount').value;
+        const language = document.getElementById('language').value;
         const imageFile = document.getElementById('bookImage').files[0]; // Lấy file ảnh
 
         if(!title || !quantity || !price || !category || !authorName) {
@@ -245,6 +265,9 @@ async function saveBook() {
         formData.append('category', category);
         formData.append('authorName', authorName);
         formData.append('description', description);
+        formData.append('publishYear', publishYear);
+        formData.append('pageCount', pageCount);
+        formData.append('language', language);
 
         if (imageFile) {
             formData.append('image', imageFile);

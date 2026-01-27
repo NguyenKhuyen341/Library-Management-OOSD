@@ -30,9 +30,9 @@ public class BookController {
 
     // Inject LoanRepository vào Constructor
     public BookController(BookService bookService,
-                          BookRepository bookRepository,
-                          AuthorRepository authorRepository,
-                          LoanRepository loanRepository) {
+                        BookRepository bookRepository,
+                        AuthorRepository authorRepository,
+                        LoanRepository loanRepository) {
         this.bookService = bookService;
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
@@ -67,6 +67,10 @@ public class BookController {
             @RequestParam("quantity") int quantity,
             @RequestParam("category") String category,
             @RequestParam("description") String description,
+            @RequestParam("publishYear") Integer publishYear,
+            @RequestParam("pageCount") Integer pageCount,
+            @RequestParam("language") String language,
+        
             @RequestParam(value = "image", required = false) MultipartFile imageFile
     ) throws IOException {
 
@@ -77,6 +81,9 @@ public class BookController {
         book.setAvailableQuantity(quantity);
         book.setCategory(category);
         book.setDescription(description);
+        book.setPublishYear(publishYear);
+        book.setPageCount(pageCount);
+        book.setLanguage(language);
 
         // Xử lý Tác giả
         if (authorName != null && !authorName.isEmpty()) {
@@ -108,6 +115,9 @@ public class BookController {
             @RequestParam("quantity") int quantity, // Số lượng tổng mới
             @RequestParam("category") String category,
             @RequestParam("description") String description,
+            @RequestParam("publishYear") Integer publishYear,
+            @RequestParam("pageCount") Integer pageCount,
+            @RequestParam("language") String language,
             @RequestParam(value = "image", required = false) MultipartFile imageFile
     ) throws IOException {
 
@@ -135,6 +145,9 @@ public class BookController {
         book.setPrice(price);
         book.setCategory(category);
         book.setDescription(description);
+        book.setPublishYear(publishYear);
+        book.setPageCount(pageCount);
+        book.setLanguage(language);
 
         if (authorName != null && !authorName.isEmpty()) {
             Author author = authorRepository.findByFullName(authorName)

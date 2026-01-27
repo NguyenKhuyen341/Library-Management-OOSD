@@ -244,8 +244,10 @@
             document.title = book.title + " - UniLib";
             document.getElementById('book-title').innerText = book.title;
             document.getElementById('book-author').innerText = book.author ? book.author.fullName : "Chưa rõ tác giả";
-            document.getElementById('book-year').innerText = book.publishYear || "2024";
+            document.getElementById('publishYear').innerText = book.publishYear || "";
             document.getElementById('book-category').innerText = book.category || "Tổng hợp";
+            document.getElementById('pageCount').value = book.pageCount || "";
+            document.getElementById('language').value = book.language || "";
             document.getElementById('book-desc').innerText = book.description || "Hiện tại chưa có mô tả chi tiết cho cuốn sách này. Bạn có thể đến thư viện để xem trực tiếp nội dung.";
 
             // Tồn kho
