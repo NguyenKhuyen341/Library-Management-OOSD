@@ -24,7 +24,7 @@ public class Book {
     private Author author;
 
     @Column(name = "category")
-    private String category;
+    private String category; // Lưu mã như: "CNTT", "KINHTE",...
 
     private double price;
 
@@ -34,13 +34,10 @@ public class Book {
     @Column(name = "total_quantity")
     private int totalQuantity;
 
-    private Integer publishYear; // Đã có sẵn
-    private String publisher;    // Đã có sẵn
-    
-    // --- CẬP NHẬT MỚI ---
-    private Integer pageCount;   
-    private String language;
+    private Integer publishYear;
+    private String publisher;
 
+    // Constructor mặc định
     public Book() {}
 
     // Getters và Setters
@@ -77,9 +74,4 @@ public class Book {
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
 
-    public Integer getPageCount() { return pageCount; }
-    public void setPageCount(Integer pageCount) { this.pageCount = pageCount; }
-
-    public String getLanguage() { return language; }
-    public void setLanguage(String language) { this.language = language; }
 }
