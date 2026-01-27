@@ -2,312 +2,147 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>UniLib Admin Dashboard</title>
+    <title>Quản lý Sách - UniLib Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root { --primary-color: #4f46e5; --sidebar-width: 260px; --bg-color: #f3f4f6; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); }
         .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0; background: white; border-right: 1px solid #e5e7eb; padding: 20px; z-index: 1000; }
         .main-content { margin-left: var(--sidebar-width); padding: 30px; }
         .nav-link { color: #64748b; padding: 12px 15px; border-radius: 10px; font-weight: 500; margin-bottom: 5px; display: flex; align-items: center; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background-color: #eef2ff; color: var(--primary-color); }
-        .stat-card { background: white; border-radius: 16px; padding: 25px; border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .status-success { background-color: #d1fae5; color: #065f46; }
-        .status-danger { background-color: #fee2e2; color: #991b1b; }
-        .btn-action { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: none; margin-right: 5px; }
-        .btn-edit { background-color: #fef3c7; color: #d97706; }
-        .btn-delete { background-color: #fee2e2; color: #dc2626; }
-        .book-cover-thumb { width: 40px; height: 55px; object-fit: cover; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="brand-logo mb-4 fs-4 fw-bold text-primary"><i class="fas fa-layer-group me-2"></i> UniLib</div>
+    <div class="mb-4 fs-4 fw-bold text-primary"><i class="fas fa-layer-group me-2"></i> UniLib</div>
     <nav class="nav flex-column">
         <a class="nav-link" href="dashboard.html"><i class="fas fa-th-large me-2"></i> Dashboard</a>
         <a class="nav-link active" href="#"><i class="fas fa-book me-2"></i> Quản lý Sách</a>
         <a class="nav-link" href="users.html"><i class="fas fa-users me-2"></i> Độc giả</a>
         <a class="nav-link" href="loans.html"><i class="fas fa-clipboard-list me-2"></i> Mượn Trả</a>
         <div class="mt-auto pt-5">
-            <a class="nav-link text-danger" href="index.html"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+            <a class="nav-link text-danger" href="index.html" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
         </div>
     </nav>
 </div>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div><h3 class="fw-bold m-0">Kho Sách</h3><p class="text-muted m-0">Quản lý và theo dõi sách trong thư viện</p></div>
-        <button class="btn btn-primary px-4 py-2 fw-bold" onclick="resetForm()" data-bs-toggle="modal" data-bs-target="#addBookModal"><i class="fas fa-plus me-2"></i> Thêm sách</button>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-md-3"><div class="stat-card"><h6 class="text-muted mb-1">Tổng đầu sách</h6><h3 class="fw-bold mb-0" id="total-books-count">0</h3></div></div>
-        <div class="col-md-3"><div class="stat-card"><h6 class="text-muted mb-1">Đang sẵn có</h6><h3 class="fw-bold mb-0" id="available-books-count">0</h3></div></div>
+        <div><h3 class="fw-bold m-0">Kho Sách</h3><p class="text-muted m-0">Thêm, sửa và cập nhật thông tin sách</p></div>
+        <button class="btn btn-primary px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#addBookModal" onclick="resetForm()">
+            <i class="fas fa-plus me-2"></i> Thêm sách
+        </button>
     </div>
 
     <div class="table-container">
         <table class="table table-hover align-middle">
-            <thead class="bg-light"><tr><th>ID</th><th>THÔNG TIN SÁCH</th><th>TÁC GIẢ</th><th>GIÁ TIỀN</th><th>TRẠNG THÁI</th><th class="text-end">HÀNH ĐỘNG</th></tr></thead>
+            <thead class="bg-light">
+                <tr><th>ID</th><th>Thông tin sách</th><th>Tác giả</th><th>Giá tiền</th><th>Trạng thái</th><th class="text-end">Hành động</th></tr>
+            </thead>
             <tbody id="book-table-body"></tbody>
         </table>
     </div>
 </div>
 
 <div class="modal fade" id="addBookModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="modalTitle">Thêm Sách Mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0"><h5 class="fw-bold" id="modalTitle">Thêm Sách Mới</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <form id="addBookForm">
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">TÊN SÁCH</label>
-                        <input type="text" id="title" class="form-control" placeholder="Nhập tên sách..." required>
+                    <div class="mb-3"><label class="form-label small fw-bold text-muted">TÊN SÁCH</label><input type="text" id="title" class="form-control" required></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3"><label class="form-label small fw-bold text-muted">SỐ LƯỢNG TỔNG</label><input type="number" id="quantity" class="form-control"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label small fw-bold text-muted">GIÁ TIỀN (VNĐ)</label><input type="number" id="price" class="form-control"></div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small text-muted fw-bold">SỐ LƯỢNG</label>
-                            <input type="number" id="quantity" class="form-control" placeholder="100">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small text-muted fw-bold">GIÁ TIỀN (VNĐ)</label>
-                            <input type="number" id="price" class="form-control" placeholder="50000">
-                        </div>
+                        <div class="col-md-4 mb-3"><label class="form-label small fw-bold text-muted">NĂM XUẤT BẢN</label><input type="number" id="publishYear" class="form-control"></div>
+                        <div class="col-md-4 mb-3"><label class="form-label small fw-bold text-muted">SỐ TRANG</label><input type="number" id="pageCount" class="form-control"></div>
+                        <div class="col-md-4 mb-3"><label class="form-label small fw-bold text-muted">NGÔN NGỮ</label><input type="text" id="language" class="form-control" value="Tiếng Việt"></div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">TÊN TÁC GIẢ</label>
-                        <input type="text" id="authorName" class="form-control" placeholder="Ví dụ: Nguyễn Nhật Ánh" list="authorSuggestions">
-                        <datalist id="authorSuggestions">
-                            <option value="Nguyễn Nhật Ánh">
-                            <option value="J.K. Rowling">
-                            <option value="Dale Carnegie">
-                        </datalist>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted">Ảnh bìa sách</label>
-                        <input type="file" id="bookImage" class="form-control" accept="image/*">
-                        <small class="text-muted">Chấp nhận: .jpg, .png, .jpeg</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted">Mô tả / Tóm tắt</label>
-                        <textarea id="description" class="form-control" rows="3" placeholder="Nhập nội dung tóm tắt sách..."></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="fw-bold small text-muted">Thể loại sách</label>
+                    <div class="mb-3"><label class="form-label small fw-bold text-muted">TÊN TÁC GIẢ</label><input type="text" id="authorName" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label small fw-bold text-muted">ẢNH BÌA</label><input type="file" id="bookImage" class="form-control" accept="image/*"></div>
+                    <div class="mb-3"><label class="form-label small fw-bold text-muted">MÔ TẢ</label><textarea id="description" class="form-control" rows="3"></textarea></div>
+                    <div class="mb-3"><label class="form-label small fw-bold text-muted">THỂ LOẠI</label>
                         <select id="category" class="form-select" required>
-                            <option value="" disabled selected>-- Chọn thể loại --</option>
-                            <option value="CNTT">Công nghệ thông tin</option>
-                            <option value="KINHTE">Kinh tế - Quản trị</option>
-                            <option value="NGOAINGU">Ngoại ngữ</option>
-                            <option value="KYNANG">Kỹ năng sống</option>
-                            <option value="VANHOC">Văn học - Tiểu thuyết</option>
-                            <option value="KHOAHOC">Khoa học cơ bản</option>
-                            <option value="DIENTU">Điện - Điện tử</option>
+                            <option value="CNTT">Công nghệ thông tin</option><option value="KINHTE">Kinh tế</option><option value="VANHOC">Văn học</option>
                         </select>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
-                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="saveBook()">Lưu thông tin</button>
-            </div>
+            <div class="modal-footer border-0"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button><button type="button" class="btn btn-primary px-4" onclick="saveBook()">Lưu thông tin</button></div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let currentEditingId = null;
-    let bookModalInstance = null;
-
-    // 1. Tải danh sách
-  async function loadBooks() {
-        try {
-            const res = await fetch('/api/books');
-            const books = await res.json();
-            const tbody = document.getElementById('book-table-body');
-            tbody.innerHTML = '';
-
-            // Thống kê
-            document.getElementById('total-books-count').innerText = books.length || 0;
-            document.getElementById('available-books-count').innerText = books.filter(b => b.availableQuantity > 0).length || 0;
-
-            books.forEach(book => {
-                let badgeClass = book.availableQuantity > 0 ? 'status-success' : 'status-danger';
-                let badgeText = book.availableQuantity > 0 ? `Còn ${book.availableQuantity} cuốn` : 'Hết hàng';
-
-                // --- BẮT ĐẦU SỬA ĐOẠN NÀY ---
-                // Logic: Kiểm tra xem sách có file ảnh (book.image) không?
-                let coverImg = '';
-                if (book.image && book.image.trim() !== "") {
-                    // Nếu có -> Dùng đường dẫn thật (/images/tên_file)
-                    coverImg = `/images/${book.image}`;
-                } else {
-                    // Nếu không -> Dùng ảnh giả (ui-avatars)
-                    coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=100&font-size=0.33`;
-                }
-                // --- KẾT THÚC SỬA ---
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="text-muted">#${book.id}</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <img src="${coverImg}" class="book-cover-thumb me-3" style="object-fit: cover;">
-                                <div>
-                                    <div class="fw-bold text-dark">${book.title}</div>
-                                    <small class="text-muted">${book.category || 'Chưa phân loại'}</small>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle text-primary fw-bold d-flex align-items-center justify-content-center me-2" style="width:30px; height:30px; font-size: 0.8rem;">
-                                    ${book.author ? book.author.fullName.charAt(0) : 'A'}
-                                </div>
-                                <span>${book.author ? book.author.fullName : 'Chưa rõ'}</span>
-                            </div>
-                        </td>
-                        <td class="fw-bold">${book.price ? book.price.toLocaleString() : 0} đ</td>
-                        <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
-                        <td class="text-end">
-                            <button class="btn-action btn-edit" onclick="openEditModal(${book.id})"><i class="fas fa-pen"></i></button>
-                            <button class="btn-action btn-delete" onclick="deleteBook(${book.id})"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-        } catch (e) { console.error(e); }
+    async function loadBooks() {
+        const res = await fetch('/api/books');
+        const books = await res.json();
+        const tbody = document.getElementById('book-table-body');
+        tbody.innerHTML = books.map(book => `
+            <tr>
+                <td>#${book.id}</td>
+                <td><div class="fw-bold">${book.title}</div><small class="text-muted">${book.category || 'Chưa phân loại'}</small></td>
+                <td>${book.author ? book.author.fullName : '---'}</td>
+                <td>${book.price.toLocaleString()} đ</td>
+                <td><span class="badge ${book.availableQuantity > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}">${book.availableQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}</span></td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-light text-primary" onclick="openEditModal(${book.id})"><i class="fas fa-pen"></i></button>
+                    <button class="btn btn-sm btn-light text-danger" onclick="deleteBook(${book.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
     }
 
-    // 2. Mở Modal Sửa (Đã cập nhật để điền Tên Tác Giả & Mô tả)
-    async function openEditModal(id) {
-        try {
-            const res = await fetch(`/api/books/${id}`);
-            const book = await res.json();
-
-            document.getElementById('title').value = book.title;
-            document.getElementById('quantity').value = book.totalQuantity;
-            document.getElementById('price').value = book.price;
-            document.getElementById('category').value = book.category || "";
-
-            // --- CẬP NHẬT MỚI: Điền Tên Tác Giả & Mô tả ---
-            document.getElementById('authorName').value = book.author ? book.author.fullName : "";
-            document.getElementById('description').value = book.description || "";
-            // ----------------------------------------------
-
-            currentEditingId = id;
-            document.getElementById('modalTitle').innerText = "Cập nhật Sách";
-
-            const modalEl = document.getElementById('addBookModal');
-            bookModalInstance = new bootstrap.Modal(modalEl);
-            bookModalInstance.show();
-        } catch (e) { Swal.fire('Lỗi', 'Không thể tải sách', 'error'); }
-    }
-
-    // 3. Lưu Sách (Đã sửa logic lấy Tên Tác Giả thay vì ID)
-async function saveBook() {
-        // Lấy dữ liệu
-        const title = document.getElementById('title').value;
-        const quantity = document.getElementById('quantity').value;
-        const price = document.getElementById('price').value;
-        const category = document.getElementById('category').value;
-        const authorName = document.getElementById('authorName').value;
-        const description = document.getElementById('description').value;
-        const imageFile = document.getElementById('bookImage').files[0]; // Lấy file ảnh
-
-        if(!title || !quantity || !price || !category || !authorName) {
-            Swal.fire('Thiếu thông tin', 'Vui lòng điền đầy đủ các trường!', 'warning');
-            return;
-        }
-
-        // --- DÙNG FORMDATA ĐỂ GỬI FILE ---
+    async function saveBook() {
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('quantity', quantity);
-        formData.append('price', price);
-        formData.append('category', category);
-        formData.append('authorName', authorName);
-        formData.append('description', description);
-
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
+        formData.append('title', document.getElementById('title').value);
+        formData.append('quantity', document.getElementById('quantity').value);
+        formData.append('price', document.getElementById('price').value);
+        formData.append('publishYear', document.getElementById('publishYear').value);
+        formData.append('pageCount', document.getElementById('pageCount').value);
+        formData.append('language', document.getElementById('language').value);
+        formData.append('authorName', document.getElementById('authorName').value);
+        formData.append('category', document.getElementById('category').value);
+        formData.append('description', document.getElementById('description').value);
+        const imageFile = document.getElementById('bookImage').files[0];
+        if (imageFile) formData.append('image', imageFile);
 
         let url = '/api/books';
-        let method = 'POST'; // Mặc định là Thêm mới
+        let method = currentEditingId ? 'PUT' : 'POST';
+        if (currentEditingId) url += '/' + currentEditingId;
 
-        if (currentEditingId) {
-            url = `/api/books/${currentEditingId}`;
-            method = 'PUT';
-        }
-
-        // Hiệu ứng nút bấm
-        const btn = event.target;
-        const oldText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải lên...';
-        btn.disabled = true;
-
-        try {
-            const res = await fetch(url, {
-                method: method,
-                // LƯU Ý: Khi gửi FormData, KHÔNG cần set Header 'Content-Type'
-                body: formData
-            });
-
-            if (res.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('addBookModal')).hide();
-                Swal.fire('Thành công!', 'Đã lưu sách và ảnh bìa.', 'success');
-                loadBooks();
-                resetForm();
-            } else {
-                Swal.fire('Lỗi', 'Không thể lưu sách.', 'error');
-            }
-        } catch (e) {
-            console.error(e);
-            Swal.fire('Lỗi Server', 'Không kết nối được.', 'error');
-        } finally {
-            btn.innerHTML = oldText;
-            btn.disabled = false;
-        }
+        const res = await fetch(url, { method: method, body: formData });
+        if (res.ok) { Swal.fire('Thành công', 'Đã lưu thông tin sách', 'success'); loadBooks(); bootstrap.Modal.getInstance(document.getElementById('addBookModal')).hide(); }
     }
 
-    function deleteBook(id) {
-        Swal.fire({
-            title: 'Xóa sách?', text: "Không thể hoàn tác!", icon: 'warning',
-            showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Xóa', cancelButtonText: 'Hủy'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const res = await fetch(`/api/books/${id}`, { method: 'DELETE' });
-                    if (res.ok) { Swal.fire('Đã xóa!', '', 'success'); loadBooks(); }
-                    else { Swal.fire('Lỗi', 'Sách đang được mượn', 'error'); }
-                } catch (e) { Swal.fire('Lỗi', '', 'error'); }
-            }
-        });
-    }
+    function resetForm() { currentEditingId = null; document.getElementById('addBookForm').reset(); document.getElementById('modalTitle').innerText = "Thêm Sách Mới"; }
 
-    function resetForm() {
-        currentEditingId = null;
-        document.getElementById('addBookForm').reset();
-        document.getElementById('category').value = "";
-        document.getElementById('modalTitle').innerText = "Thêm Sách Mới";
+    async function openEditModal(id) {
+        const res = await fetch('/api/books/' + id);
+        const book = await res.json();
+        currentEditingId = id;
+        document.getElementById('modalTitle').innerText = "Cập nhật Sách";
+        document.getElementById('title').value = book.title;
+        document.getElementById('quantity').value = book.totalQuantity;
+        document.getElementById('price').value = book.price;
+        document.getElementById('publishYear').value = book.publishYear || "";
+        document.getElementById('pageCount').value = book.pageCount || "";
+        document.getElementById('language').value = book.language || "Tiếng Việt";
+        document.getElementById('authorName').value = book.author ? book.author.fullName : "";
+        document.getElementById('description').value = book.description || "";
+        document.getElementById('category').value = book.category || "CNTT";
+        new bootstrap.Modal(document.getElementById('addBookModal')).show();
     }
 
     loadBooks();

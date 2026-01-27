@@ -52,6 +52,17 @@
 
         .btn-borrow { width: 100%; padding: 12px; border-radius: 12px; font-weight: 600; background: var(--light-bg); color: var(--primary); border: none; transition: 0.2s; }
         .btn-borrow:hover:not(:disabled) { background: var(--primary); color: white; }
+
+        /* FOOTER */
+        footer {
+        background: #0f172a;
+        color: #94a3b8;
+        margin-top: auto;
+        padding: 50px 0 30px;
+        border-top: none;
+        }
+        footer h5 { color: white; font-weight: 700; }
+        footer .text-primary { color: #4f46e5 !important; }
     </style>
 </head>
 <body>
@@ -109,9 +120,22 @@
     </div>
 </div>
 
-<footer class="bg-white py-5 mt-5 border-top">
-    <div class="container text-center">
-        <p class="text-muted small">© 2024 University Library Project. Designed with ❤️ by You.</p>
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="mb-3">Về UniLib</h5>
+                <p class="small">Hệ thống thư viện số hiện đại dành cho sinh viên.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="mb-3">Liên hệ</h5>
+                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 2 Võ Oanh, Quận Bình Thạnh, TP.HCM</p>
+                <p class="small"><i class="fas fa-envelope me-2 text-primary"></i> contact@unilib.edu.vn</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <p class="small text-muted">&copy; 2024 UniLib Library System.</p>
+            </div>
+        </div>
     </div>
 </footer>
 
@@ -150,7 +174,7 @@
         if (e.key === 'Enter') doSearch();
     });
 
-   async function fetchBooks(keyword = '') {
+    async function fetchBooks(keyword = '') {
         const listDiv = document.getElementById('book-list');
         // Hiển thị loading
         listDiv.innerHTML = `
