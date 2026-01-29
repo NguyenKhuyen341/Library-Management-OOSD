@@ -13,6 +13,14 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; display: flex; flex-direction: column; min-height: 100vh; }
 
+        /* NAVBAR */
+        .navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 0; }
+        .navbar-brand { font-weight: 800; color: #4f46e5 !important; font-size: 1.5rem; }
+        .nav-link { font-weight: 600; color: #64748b !important; margin: 0 10px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: #4f46e5 !important; }
+        .btn-login { background: transparent; color: #4f46e5; font-weight: 700; border: 2px solid rgba(79, 70, 229, 0.1); }
+        .btn-register { background: #4f46e5; color: white; font-weight: 700; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39); }
+
         /* Sidebar bên trái */
         .sidebar { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
         .cat-link {
@@ -42,21 +50,20 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary fs-4" href="index.html"><i class="fas fa-book-reader me-2"></i>UniLib.</a>
+        <a class="navbar-brand" href="index.html"><i class="fas fa-book-open-reader me-2"></i>UniLib.</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto fw-bold">
-                <li class="nav-item"><a class="nav-link" href="index.html">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link active text-primary" href="catalog.html">Danh mục</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Sách mới</a></li>
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html">Khám phá</a></li>
+                <li class="nav-item"><a class="nav-link active" href="catalog.html">Danh mục</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
             </ul>
-
-            <div id="user-actions">
-            </div>
+            <div class="d-flex gap-2 align-items-center" id="user-actions"></div>
         </div>
     </div>
 </nav>
@@ -98,7 +105,7 @@
             </div>
             <div class="col-md-4">
                 <h5 class="text-white fw-bold mb-3">Liên hệ</h5>
-                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 123 Nguyễn Văn Cừ, Q.5, TP.HCM</p>
+                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 2 Võ Oanh, Quận Bình Thạnh, TP.HCM</p>
                 <p class="small"><i class="fas fa-envelope me-2 text-primary"></i> contact@unilib.edu.vn</p>
             </div>
             <div class="col-md-4 text-md-end">
@@ -174,34 +181,41 @@
     // --- CHECK LOGIN: HIỂN THỊ MENU USER ---
     function checkLogin() {
         const userJson = localStorage.getItem('currentUser');
-        const div = document.getElementById('user-actions');
+        const actionDiv = document.getElementById('user-actions');
 
-        if(userJson) {
+        if (userJson) {
             const user = JSON.parse(userJson);
-            const ava = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff`;
+            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff`;
 
-            // Code HTML Dropdown chuẩn Bootstrap
-            div.innerHTML = `
+            actionDiv.innerHTML = `
                 <div class="dropdown">
-                    <button class="btn btn-light border rounded-pill py-1 px-2 d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="${ava}" class="rounded-circle" width="32" height="32">
-                        <span class="fw-bold small d-none d-sm-inline">${user.fullName}</span>
+                    <button class="btn btn-light border rounded-pill py-1 px-2 d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown">
+                        <img src="${avatarUrl}" class="rounded-circle" width="32" height="32">
+                        <span class="fw-bold small me-1">${user.fullName}</span>
                         <i class="fas fa-chevron-down small text-muted"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end mt-2 shadow border-0">
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-2 p-2" style="border-radius: 12px;">
                         <li><h6 class="dropdown-header">Xin chào, ${user.fullName}!</h6></li>
-                        <li><a class="dropdown-item" href="student-dashboard.html"><i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ của tôi</a></li>
-                        <li><a class="dropdown-item" href="student-dashboard.html"><i class="fas fa-history me-2 text-info"></i>Lịch sử mượn</a></li>
+                        <li><a class="dropdown-item rounded-2" href="student-dashboard.html"><i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ của tôi</a></li>
+                        <li><a class="dropdown-item rounded-2" href="student-dashboard.html"><i class="fas fa-history me-2 text-info"></i>Lịch sử mượn</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger fw-bold" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        <li><a class="dropdown-item rounded-2 text-danger fw-bold" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                     </ul>
-                </div>`;
+                </div>
+            `;
         } else {
-            div.innerHTML = `<a href="login.html" class="btn btn-primary rounded-pill px-4 fw-bold">Đăng nhập</a>`;
+            actionDiv.innerHTML = `
+                <a href="login.html" class="btn btn-login rounded-pill px-4 fw-bold text-decoration-none me-2">Đăng nhập</a>
+                <a href="register.html" class="btn btn-register rounded-pill px-4 fw-bold text-decoration-none">Đăng ký</a>
+            `;
         }
     }
 
-    function logout() { localStorage.removeItem('currentUser'); location.reload(); }
+    // Hàm logout đồng bộ
+    function logout() {
+        localStorage.removeItem('currentUser');
+        window.location.reload();
+    }
 
     async function borrowBook(bookId) {
         const userJson = localStorage.getItem('currentUser');
