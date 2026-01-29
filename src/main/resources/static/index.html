@@ -52,6 +52,12 @@
 
         .btn-borrow { width: 100%; padding: 12px; border-radius: 12px; font-weight: 600; background: var(--light-bg); color: var(--primary); border: none; transition: 0.2s; }
         .btn-borrow:hover:not(:disabled) { background: var(--primary); color: white; }
+
+        /* FOOTER ĐEN */
+        footer { background: #1a1a1a; color: #aaa; padding: 40px 0; font-size: 0.85rem; margin-top: auto; }
+        footer h6 { color: #f59e0b; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; font-size: 0.9rem; } /* Màu vàng cam */
+        footer p { margin-bottom: 8px; }
+
     </style>
 </head>
 <body>
@@ -66,9 +72,8 @@
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item"><a class="nav-link active" href="#">Khám phá</a></li>
                 <a class="nav-link" href="catalog.html">Danh mục</a>
-                <li class="nav-item"><a class="nav-link" href="#">Sách mới</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.html">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link" href="contact.html">Liên hệ</a></li>
             </ul>
             <div class="d-flex gap-2 align-items-center" id="user-actions"></div>
         </div>
@@ -110,9 +115,27 @@
     </div>
 </div>
 
-<footer class="bg-white py-5 mt-5 border-top">
-    <div class="container text-center">
-        <p class="text-muted small">© 2024 University Library Project. Designed with ❤️ by You.</p>
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6>LIÊN HỆ</h6>
+                <p><i class="fas fa-phone me-2"></i> Điện thoại: 0369-xxx-xxx</p>
+                <p><i class="fas fa-envelope me-2"></i> Email: contact@unilib.edu.vn</p>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6>THÔNG TIN MÔN HỌC</h6>
+                <p>Môn học: Xây dựng phần mềm hướng đối tượng (OOSD)</p>
+                <p>Giáo viên hướng dẫn: Vũ Đình Long</p>
+                <p>Niên khóa: 2025 - 2026</p>
+            </div>
+            <div class="col-md-4">
+                <h6>TRƯỜNG ĐẠI HỌC GTVT TP.HCM</h6>
+                <p>Địa chỉ: Số 2, đường Võ Oanh, Phường 25, Quận Bình Thạnh, TP. HCM</p>
+                <p>Bậc đào tạo: Đại học - Chính quy</p>
+                <p>Khoa: Công nghệ thông tin</p>
+            </div>
+        </div>
     </div>
 </footer>
 

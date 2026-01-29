@@ -15,15 +15,35 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; flex-direction: column; min-height: 100vh; }
 
         /* NAVBAR HEADER */
-        .navbar-glass {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            transition: 0.3s;
-            padding-top: 15px;
+        .navbar {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent) !important;
+            backdrop-filter: none;
+            padding: 15px 0;
+            box-shadow: none;
         }
-        .nav-link { color: rgba(255,255,255,0.9) !important; font-weight: 500; margin: 0 10px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .nav-link:hover { color: #fff !important; transform: translateY(-1px); }
+        .navbar-brand {
+            font-weight: 800;
+            color: rgb(78, 70, 229) !important;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .nav-link {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9) !important;
+            margin: 0 10px;
+            transition: 0.3s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            text-decoration: underline;
+        }
 
-        /* BACKDROP HERO (NỀN MỜ) */
+        .btn-login { background: transparent; color: var(--primary); font-weight: 700; border: 2px solid rgba(79, 70, 229, 0.1); }
+        .btn-register { background: var(--primary); color: white; font-weight: 700; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39); }
+
+        /* BACKDROP HERO */
         .backdrop-container {
             position: relative;
             background: #1e293b;
@@ -35,7 +55,7 @@
             object-fit: cover; filter: blur(25px) brightness(0.5); transform: scale(1.1);
         }
 
-        /* CARD MAIN (THẺ NỔI) */
+        /* CARD MAIN */
         .main-card {
             margin-top: -250px;
             background: rgba(255, 255, 255, 0.98);
@@ -75,9 +95,9 @@
         .bg-unavailable { background: #fee2e2; color: #b91c1c; }
 
         /* FOOTER */
-        footer { background: #0f172a; color: #94a3b8; margin-top: auto; padding: 60px 0 30px; }
-        footer a { color: #cbd5e1; text-decoration: none; transition: 0.2s; }
-        footer a:hover { color: #fff; text-decoration: underline; }
+        footer { background: #1a1a1a; color: #aaa; padding: 40px 0; font-size: 0.85rem; margin-top: auto; }
+        footer h6 { color: #f59e0b; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; font-size: 0.9rem; } /* Màu vàng cam */
+        footer p { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -93,9 +113,8 @@
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item"><a class="nav-link" href="index.html">Khám phá</a></li>
                 <li class="nav-item"><a class="nav-link" href="catalog.html">Danh mục</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Sách mới</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.html">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link" href="contact.html">Liên hệ</a></li>
             </ul>
             <div id="user-actions" class="d-flex align-items-center gap-2"></div>
         </div>
@@ -172,18 +191,23 @@
 
 <footer>
     <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <h5 class="text-white fw-bold mb-3">Về UniLib</h5>
-                <p class="small opacity-75">Hệ thống thư viện số hiện đại dành cho sinh viên.</p>
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6>LIÊN HỆ</h6>
+                <p><i class="fas fa-phone me-2"></i> Điện thoại: 0369-xxx-xxx</p>
+                <p><i class="fas fa-envelope me-2"></i> Email: contact@unilib.edu.vn</p>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6>THÔNG TIN MÔN HỌC</h6>
+                <p>Môn học: Xây dựng phần mềm hướng đối tượng (OOSD)</p>
+                <p>Giáo viên hướng dẫn: Vũ Đình Long</p>
+                <p>Niên khóa: 2025 - 2026</p>
             </div>
             <div class="col-md-4">
-                <h5 class="text-white fw-bold mb-3">Liên hệ</h5>
-                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 123 Nguyễn Văn Cừ, Q.5, TP.HCM</p>
-                <p class="small"><i class="fas fa-envelope me-2 text-primary"></i> contact@unilib.edu.vn</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <p class="small text-muted">&copy; 2024 UniLib Library System.</p>
+                <h6>TRƯỜNG ĐẠI HỌC GTVT TP.HCM</h6>
+                <p>Địa chỉ: Số 2, đường Võ Oanh, Phường 25, Quận Bình Thạnh, TP. HCM</p>
+                <p>Bậc đào tạo: Đại học - Chính quy</p>
+                <p>Khoa: Công nghệ thông tin</p>
             </div>
         </div>
     </div>
@@ -194,7 +218,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('id');
 
-    // --- 1. CHECK LOGIN (ĐÃ UPDATE GIAO DIỆN NÚT) ---
+    // --- 1. CHECK LOGIN ---
     function checkLoginState() {
         const userJson = localStorage.getItem('currentUser');
         const actionDiv = document.getElementById('user-actions');
@@ -203,7 +227,7 @@
             const user = JSON.parse(userJson);
             const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff`;
 
-            // Style nút User: Nền trắng, bo tròn, giống trang chủ
+            // Style nút User
             actionDiv.innerHTML = `
                 <div class="dropdown">
                     <button class="btn btn-light border rounded-pill py-1 px-2 d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -221,6 +245,7 @@
                 </div>
             `;
         } else {
+            // Nút đăng nhập màu trắng nổi bật trên nền tối
             actionDiv.innerHTML = `
                 <a href="login.html" class="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm">Đăng nhập</a>
             `;
@@ -229,7 +254,7 @@
 
     function logout() { localStorage.removeItem('currentUser'); window.location.reload(); }
 
-    // --- 2. LOAD SÁCH (ĐÃ SỬA LỖI MAPPING ID) ---
+    // --- 2. LOAD SÁCH ---
     async function loadBookDetails() {
         if (!bookId) {
             Swal.fire('Lỗi', 'Không tìm thấy ID sách!', 'error').then(() => window.location.href = 'index.html');
@@ -247,19 +272,13 @@
             document.getElementById('book-author').innerText = book.author ? book.author.fullName : "Chưa rõ tác giả";
             document.getElementById('book-category').innerText = book.category || "Tổng hợp";
             document.getElementById('book-desc').innerText = book.description || "Hiện tại chưa có mô tả chi tiết cho cuốn sách này.";
-
-            // --- ĐOẠN SỬA LỖI TRỎ SAI ID ---
-            // Sửa 'publishYear' thành 'book-year' để khớp với ID trong HTML
             document.getElementById('book-year').innerText = book.publishYear || "---";
-            
-            // Cập nhật Số trang và Ngôn ngữ từ dữ liệu API thay vì để giá trị tĩnh
-            // Tìm đến thẻ div chứa text "350" và "Tiếng Việt" để gán ID hoặc thay thế nội dung
+            // Cập nhật thông tin bổ sung
             const metaValues = document.querySelectorAll('.meta-value');
             if (metaValues.length >= 4) {
                 metaValues[2].innerText = book.pageCount || "---"; // Số trang
                 metaValues[3].innerText = book.language || "---"; // Ngôn ngữ
             }
-            // ----------------------------------------------
 
             // Cập nhật trạng thái kho
             const stockEl = document.getElementById('stock-badge');

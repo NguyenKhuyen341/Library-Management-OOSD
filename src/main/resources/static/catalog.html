@@ -43,9 +43,9 @@
         .badge-out { position: absolute; top: 10px; right: 10px; background: rgba(254, 226, 226, 0.95); color: #991b1b; font-size: 0.75rem; font-weight: 700; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         /* Footer */
-        footer { background: #0f172a; color: #94a3b8; margin-top: auto; padding-top: 50px; padding-bottom: 20px; }
-        footer a { color: #cbd5e1; text-decoration: none; transition: 0.2s; }
-        footer a:hover { color: #fff; text-decoration: underline; }
+        footer { background: #1a1a1a; color: #aaa; padding: 40px 0; font-size: 0.85rem; margin-top: auto; }
+        footer h6 { color: #f59e0b; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; font-size: 0.9rem; } /* Màu vàng cam */
+        footer p { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -60,8 +60,8 @@
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item"><a class="nav-link" href="index.html">Khám phá</a></li>
                 <li class="nav-item"><a class="nav-link active" href="catalog.html">Danh mục</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Về chúng tôi</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.html">Giới thiệu</a></li>
+                <li class="nav-item"><a class="nav-link" href="contact.html">Liên hệ</a></li>
             </ul>
             <div class="d-flex gap-2 align-items-center" id="user-actions"></div>
         </div>
@@ -98,18 +98,23 @@
 
 <footer>
     <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <h5 class="text-white fw-bold mb-3">Về UniLib</h5>
-                <p class="small">Hệ thống thư viện số hiện đại dành cho sinh viên.</p>
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6>LIÊN HỆ</h6>
+                <p><i class="fas fa-phone me-2"></i> Điện thoại: 0369-xxx-xxx</p>
+                <p><i class="fas fa-envelope me-2"></i> Email: contact@unilib.edu.vn</p>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h6>THÔNG TIN MÔN HỌC</h6>
+                <p>Môn học: Xây dựng phần mềm hướng đối tượng (OOSD)</p>
+                <p>Giáo viên hướng dẫn: Vũ Đình Long</p>
+                <p>Niên khóa: 2025 - 2026</p>
             </div>
             <div class="col-md-4">
-                <h5 class="text-white fw-bold mb-3">Liên hệ</h5>
-                <p class="small mb-1"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 2 Võ Oanh, Quận Bình Thạnh, TP.HCM</p>
-                <p class="small"><i class="fas fa-envelope me-2 text-primary"></i> contact@unilib.edu.vn</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <p class="small text-muted">&copy; 2024 UniLib Library System.</p>
+                <h6>TRƯỜNG ĐẠI HỌC GTVT TP.HCM</h6>
+                <p>Địa chỉ: Số 2, đường Võ Oanh, Phường 25, Quận Bình Thạnh, TP. HCM</p>
+                <p>Bậc đào tạo: Đại học - Chính quy</p>
+                <p>Khoa: Công nghệ thông tin</p>
             </div>
         </div>
     </div>
