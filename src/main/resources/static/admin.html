@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>UniLib Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,53 +14,96 @@
     <style>
         :root { --primary-color: #4f46e5; --sidebar-width: 260px; --bg-color: #f3f4f6; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); overflow-x: hidden; }
+
+        /* Sidebar */
         .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0; background: white; border-right: 1px solid #e5e7eb; padding: 20px; z-index: 1000; }
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
-        .nav-link { color: #64748b; padding: 12px 15px; border-radius: 10px; font-weight: 500; margin-bottom: 5px; display: flex; align-items: center; text-decoration: none; }
+        .brand-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 40px; display: flex; align-items: center; }
+        .nav-link { color: #64748b; padding: 12px 15px; border-radius: 10px; font-weight: 500; margin-bottom: 5px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background-color: #eef2ff; color: var(--primary-color); }
-        .stat-card { background: white; border-radius: 16px; padding: 25px; border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .nav-link i { width: 25px; }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        .stat-card { background: white; border-radius: 16px; padding: 25px; border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); height: 100%; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+
+        /* Table */
+        .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-top: 30px; }
         .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
         .status-success { background-color: #d1fae5; color: #065f46; }
         .status-danger { background-color: #fee2e2; color: #991b1b; }
-        .btn-action { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: none; margin-right: 5px; }
+
+        .btn-action { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: none; margin-right: 5px; transition: 0.2s; }
         .btn-edit { background-color: #fef3c7; color: #d97706; }
+        .btn-edit:hover { background-color: #fcd34d; }
         .btn-delete { background-color: #fee2e2; color: #dc2626; }
-        .book-cover-thumb { width: 40px; height: 55px; object-fit: cover; border-radius: 6px; }
+        .btn-delete:hover { background-color: #fca5a5; }
+
+        .book-cover-thumb { width: 40px; height: 55px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="brand-logo"><i class="fas fa-layer-group me-2"></i> UniLib</div>
-    <nav class="nav flex-column">
-        <a class="nav-link" href="admin.html"><i class="fas fa-th-large"></i> Dashboard</a>
+    <div class="brand-logo"><i class="fas fa-layer-group me-2"></i> UniLib </div>
+    <nav class="nav flex-column h-100">
+        <a class="nav-link" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
         <a class="nav-link active" href="admin.html"><i class="fas fa-book"></i> Quản lý Sách</a>
         <a class="nav-link" href="users.html"><i class="fas fa-users"></i> Độc giả</a>
         <a class="nav-link" href="loans.html"><i class="fas fa-clipboard-list"></i> Mượn Trả</a>
         <a class="nav-link" href="admin-contacts.html"><i class="fas fa-envelope"></i> Liên hệ</a>
-        <div style="margin-top: auto; padding-top: 100%;">
-            <a class="nav-link text-danger" href="index.html"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+        <a class="nav-link text-danger" href="index.html"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+
+        <div style="margin-top: auto;">
+            <hr>
+            <a class="nav-link text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
         </div>
     </nav>
 </div>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div><h3 class="fw-bold m-0">Kho Sách</h3><p class="text-muted m-0">Quản lý và theo dõi sách trong thư viện</p></div>
-        <button class="btn btn-primary px-4 py-2 fw-bold" onclick="resetForm()" data-bs-toggle="modal" data-bs-target="#addBookModal"><i class="fas fa-plus me-2"></i> Thêm sách</button>
+        <div>
+            <h3 class="fw-bold m-0">Kho Sách</h3>
+            <p class="text-muted m-0">Quản lý và theo dõi sách trong thư viện</p>
+        </div>
+        <button class="btn btn-primary px-4 py-2 fw-bold shadow-sm" onclick="resetForm()" data-bs-toggle="modal" data-bs-target="#addBookModal">
+            <i class="fas fa-plus me-2"></i> Thêm sách mới
+        </button>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-3"><div class="stat-card"><h6 class="text-muted mb-1">Tổng đầu sách</h6><h3 class="fw-bold mb-0" id="total-books-count">0</h3></div></div>
-        <div class="col-md-3"><div class="stat-card"><h6 class="text-muted mb-1">Đang sẵn có</h6><h3 class="fw-bold mb-0" id="available-books-count">0</h3></div></div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted mb-2 text-uppercase small fw-bold">Tổng đầu sách</h6>
+                <h3 class="fw-bold mb-0 text-primary" id="total-books-count">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted mb-2 text-uppercase small fw-bold">Đang sẵn có</h6>
+                <h3 class="fw-bold mb-0 text-success" id="available-books-count">0</h3>
+            </div>
+        </div>
     </div>
 
     <div class="table-container">
-        <table class="table table-hover align-middle">
-            <thead class="bg-light"><tr><th>ID</th><th>THÔNG TIN SÁCH</th><th>TÁC GIẢ</th><th>GIÁ TIỀN</th><th>TRẠNG THÁI</th><th class="text-end">HÀNH ĐỘNG</th></tr></thead>
-            <tbody id="book-table-body"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="bg-light">
+                <tr>
+                    <th class="ps-3">ID</th>
+                    <th>THÔNG TIN SÁCH</th>
+                    <th>TÁC GIẢ</th>
+                    <th>GIÁ TIỀN</th>
+                    <th>TRẠNG THÁI</th>
+                    <th class="text-end pe-3">HÀNH ĐỘNG</th>
+                </tr>
+                </thead>
+                <tbody id="book-table-body">
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -76,6 +120,7 @@
                         <label class="form-label small text-muted fw-bold">TÊN SÁCH</label>
                         <input type="text" id="title" class="form-control" placeholder="Nhập tên sách..." required>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label small text-muted fw-bold">SỐ LƯỢNG</label>
@@ -89,27 +134,26 @@
 
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                        <label class="form-label small text-muted fw-bold">NĂM XUẤT BẢN</label>
-                        <input type="number" id="publishYear" class="form-control" placeholder="2024">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label small text-muted fw-bold">SỐ TRANG</label>
-                        <input type="number" id="pageCount" class="form-control" placeholder="350">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label small text-muted fw-bold">NGÔN NGỮ</label>
-                        <input type="text" id="language" class="form-control" placeholder="Tiếng Việt">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted fw-bold">TÊN TÁC GIẢ</label>
-                        <input type="text" id="authorName" class="form-control" placeholder="Ví dụ: Nguyễn Nhật Ánh" list="authorSuggestions">
-                        <datalist id="authorSuggestions">
-                            <option value="Nguyễn Nhật Ánh">
-                            <option value="J.K. Rowling">
-                            <option value="Dale Carnegie">
-                        </datalist>
-                    </div>
+                            <label class="form-label small text-muted fw-bold">NĂM XUẤT BẢN</label>
+                            <input type="number" id="publishYear" class="form-control" placeholder="2024">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label small text-muted fw-bold">SỐ TRANG</label>
+                            <input type="number" id="pageCount" class="form-control" placeholder="350">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label small text-muted fw-bold">NGÔN NGỮ</label>
+                            <input type="text" id="language" class="form-control" placeholder="Tiếng Việt">
+                        </div>
+                    </div> <div class="mb-3">
+                    <label class="form-label small text-muted fw-bold">TÊN TÁC GIẢ</label>
+                    <input type="text" id="authorName" class="form-control" placeholder="Ví dụ: Nguyễn Nhật Ánh" list="authorSuggestions">
+                    <datalist id="authorSuggestions">
+                        <option value="Nguyễn Nhật Ánh">
+                        <option value="J.K. Rowling">
+                        <option value="Dale Carnegie">
+                    </datalist>
+                </div>
 
                     <div class="mb-3">
                         <label class="fw-bold small text-muted">Ảnh bìa sách</label>
@@ -152,7 +196,7 @@
     let bookModalInstance = null;
 
     // 1. Tải danh sách
-async function loadBooks() {
+    async function loadBooks() {
         try {
             const res = await fetch('/api/books');
             const books = await res.json();
@@ -167,24 +211,20 @@ async function loadBooks() {
                 let badgeClass = book.availableQuantity > 0 ? 'status-success' : 'status-danger';
                 let badgeText = book.availableQuantity > 0 ? `Còn ${book.availableQuantity} cuốn` : 'Hết hàng';
 
-                // --- BẮT ĐẦU SỬA ĐOẠN NÀY ---
-                // Logic: Kiểm tra xem sách có file ảnh (book.image) không?
+                // Xử lý ảnh bìa
                 let coverImg = '';
                 if (book.image && book.image.trim() !== "") {
-                    // Nếu có -> Dùng đường dẫn thật (/images/tên_file)
                     coverImg = `/images/${book.image}`;
                 } else {
-                    // Nếu không -> Dùng ảnh giả (ui-avatars)
                     coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random&size=100&font-size=0.33`;
                 }
-                // --- KẾT THÚC SỬA ---
 
                 tbody.innerHTML += `
                     <tr>
-                        <td class="text-muted">#${book.id}</td>
+                        <td class="text-muted ps-3">#${book.id}</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <img src="${coverImg}" class="book-cover-thumb me-3" style="object-fit: cover;">
+                                <img src="${coverImg}" class="book-cover-thumb me-3">
                                 <div>
                                     <div class="fw-bold text-dark">${book.title}</div>
                                     <small class="text-muted">${book.category || 'Chưa phân loại'}</small>
@@ -201,7 +241,7 @@ async function loadBooks() {
                         </td>
                         <td class="fw-bold">${book.price ? book.price.toLocaleString() : 0} đ</td>
                         <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
-                        <td class="text-end">
+                        <td class="text-end pe-3">
                             <button class="btn-action btn-edit" onclick="openEditModal(${book.id})"><i class="fas fa-pen"></i></button>
                             <button class="btn-action btn-delete" onclick="deleteBook(${book.id})"><i class="fas fa-trash"></i></button>
                         </td>
@@ -211,24 +251,22 @@ async function loadBooks() {
         } catch (e) { console.error(e); }
     }
 
-    // 2. Mở Modal Sửa (Đã cập nhật để điền Tên Tác Giả & Mô tả)
+    // 2. Mở Modal Sửa
     async function openEditModal(id) {
         try {
             const res = await fetch(`/api/books/${id}`);
             const book = await res.json();
 
+            // Điền dữ liệu vào form
             document.getElementById('title').value = book.title;
             document.getElementById('quantity').value = book.totalQuantity;
             document.getElementById('price').value = book.price;
             document.getElementById('category').value = book.category || "";
-
-            // --- CẬP NHẬT MỚI: Điền Tên Tác Giả & Mô tả ---
             document.getElementById('authorName').value = book.author ? book.author.fullName : "";
             document.getElementById('description').value = book.description || "";
             document.getElementById('publishYear').value = book.publishYear || "";
             document.getElementById('pageCount').value = book.pageCount || "";
             document.getElementById('language').value = book.language || "";
-            // ----------------------------------------------
 
             currentEditingId = id;
             document.getElementById('modalTitle').innerText = "Cập nhật Sách";
@@ -239,9 +277,8 @@ async function loadBooks() {
         } catch (e) { Swal.fire('Lỗi', 'Không thể tải sách', 'error'); }
     }
 
-    // 3. Lưu Sách (Đã sửa logic lấy Tên Tác Giả thay vì ID)
+    // 3. Lưu Sách (Thêm mới hoặc Cập nhật)
     async function saveBook() {
-        // Lấy dữ liệu
         const title = document.getElementById('title').value;
         const quantity = document.getElementById('quantity').value;
         const price = document.getElementById('price').value;
@@ -251,14 +288,13 @@ async function loadBooks() {
         const publishYear = document.getElementById('publishYear').value;
         const pageCount = document.getElementById('pageCount').value;
         const language = document.getElementById('language').value;
-        const imageFile = document.getElementById('bookImage').files[0]; // Lấy file ảnh
+        const imageFile = document.getElementById('bookImage').files[0];
 
         if(!title || !quantity || !price || !category || !authorName) {
-            Swal.fire('Thiếu thông tin', 'Vui lòng điền đầy đủ các trường!', 'warning');
+            Swal.fire('Thiếu thông tin', 'Vui lòng điền đầy đủ các trường bắt buộc!', 'warning');
             return;
         }
 
-        // --- DÙNG FORMDATA ĐỂ GỬI FILE ---
         const formData = new FormData();
         formData.append('title', title);
         formData.append('quantity', quantity);
@@ -269,35 +305,35 @@ async function loadBooks() {
         formData.append('publishYear', publishYear);
         formData.append('pageCount', pageCount);
         formData.append('language', language);
-
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
+        if (imageFile) formData.append('image', imageFile);
 
         let url = '/api/books';
-        let method = 'POST'; // Mặc định là Thêm mới
+        let method = 'POST';
 
         if (currentEditingId) {
             url = `/api/books/${currentEditingId}`;
             method = 'PUT';
         }
 
-        // Hiệu ứng nút bấm
+        // Loading effect
         const btn = event.target;
         const oldText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải lên...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
         btn.disabled = true;
 
         try {
             const res = await fetch(url, {
                 method: method,
-                // LƯU Ý: Khi gửi FormData, KHÔNG cần set Header 'Content-Type'
                 body: formData
             });
 
             if (res.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('addBookModal')).hide();
-                Swal.fire('Thành công!', 'Đã lưu sách và ảnh bìa.', 'success');
+                // Tắt modal thủ công nếu dùng instance
+                const modalEl = document.getElementById('addBookModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                Swal.fire('Thành công!', 'Đã lưu thông tin sách.', 'success');
                 loadBooks();
                 resetForm();
             } else {
@@ -312,21 +348,32 @@ async function loadBooks() {
         }
     }
 
+    // 4. Xóa sách
     function deleteBook(id) {
         Swal.fire({
-            title: 'Xóa sách?', text: "Không thể hoàn tác!", icon: 'warning',
-            showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Xóa', cancelButtonText: 'Hủy'
+            title: 'Xóa sách?',
+            text: "Dữ liệu sẽ không thể khôi phục!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Xóa ngay',
+            cancelButtonText: 'Hủy'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
                     const res = await fetch(`/api/books/${id}`, { method: 'DELETE' });
-                    if (res.ok) { Swal.fire('Đã xóa!', '', 'success'); loadBooks(); }
-                    else { Swal.fire('Lỗi', 'Sách đang được mượn', 'error'); }
-                } catch (e) { Swal.fire('Lỗi', '', 'error'); }
+                    if (res.ok) {
+                        Swal.fire('Đã xóa!', 'Sách đã được xóa khỏi hệ thống.', 'success');
+                        loadBooks();
+                    } else {
+                        Swal.fire('Lỗi', 'Sách này đang được mượn, không thể xóa!', 'error');
+                    }
+                } catch (e) { Swal.fire('Lỗi', 'Lỗi kết nối server', 'error'); }
             }
         });
     }
 
+    // 5. Reset Form
     function resetForm() {
         currentEditingId = null;
         document.getElementById('addBookForm').reset();
@@ -334,6 +381,24 @@ async function loadBooks() {
         document.getElementById('modalTitle').innerText = "Thêm Sách Mới";
     }
 
+    // 6. Đăng xuất
+    function logout() {
+        Swal.fire({
+            title: 'Đăng xuất?',
+            text: "Bạn có chắc muốn thoát phiên làm việc?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Đăng xuất',
+            cancelButtonText: 'Ở lại'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
+    // Chạy khi tải trang
     loadBooks();
 </script>
 </body>
