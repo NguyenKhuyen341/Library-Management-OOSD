@@ -87,15 +87,15 @@
             <form onsubmit="submitContact(event)">
                 <div class="mb-3">
                     <label class="form-label">Họ và tên *</label>
-                    <input type="text" class="form-control" placeholder="Nhập họ tên của bạn" required>
+                    <input type="text" id="fullName" class="form-control" placeholder="Nhập họ tên của bạn" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email *</label>
-                    <input type="email" class="form-control" placeholder="Nhập địa chỉ email" required>
+                    <input type="email" id="email" class="form-control" placeholder="Nhập địa chỉ email" required>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Nội dung *</label>
-                    <textarea class="form-control" rows="5" placeholder="Nhập nội dung tin nhắn" required></textarea>
+                    <textarea id="message" class="form-control" rows="5" placeholder="Nhập nội dung tin nhắn" required></textarea>
                 </div>
                 <button type="submit" class="btn btn-send">GỬI TIN NHẮN</button>
             </form>
@@ -160,13 +160,60 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // 1. HÀM KIỂM TRA ĐĂNG NHẬP (ĐÃ ĐỒNG BỘ)
+    // 1. XỬ LÝ GỬI LIÊN HỆ (Quan trọng)
+    async function submitContact(e) {
+        e.preventDefault();
+        
+        // Lấy các phần tử input
+        const fullNameInput = e.target.querySelector('input[type="text"]');
+        const emailInput = e.target.querySelector('input[type="email"]');
+        const messageInput = e.target.querySelector('textarea');
+        const submitBtn = e.target.querySelector('.btn-send');
+
+        // Tạo đối tượng dữ liệu theo đúng Entity Contact trong Backend
+        const contactData = {
+            fullName: fullNameInput.value,
+            email: emailInput.value,
+            message: messageInput.value
+        };
+
+        // Hiệu ứng chờ
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'ĐANG GỬI...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/contacts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã gửi!',
+                    text: 'Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất.',
+                    confirmButtonColor: '#4f46e5'
+                });
+                e.target.reset(); // Xóa sạch form sau khi gửi thành công
+            } else {
+                throw new Error('Gửi thất bại');
+            }
+        } catch (error) {
+            Swal.fire('Lỗi', 'Không thể gửi tin nhắn lúc này. Vui lòng thử lại sau.', 'error');
+        } finally {
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    // 2. LOGIC CHECK LOGIN (Giống các trang khác)
     function checkLoginState() {
         const userJson = localStorage.getItem('currentUser');
         const actionDiv = document.getElementById('user-actions');
 
         if (userJson) {
-            // --- TRẠNG THÁI: ĐÃ ĐĂNG NHẬP ---
             const user = JSON.parse(userJson);
             const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff`;
             
@@ -180,13 +227,11 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" style="border-radius: 12px;">
                         <li><h6 class="dropdown-header text-uppercase small fw-bold">Xin chào, ${user.fullName}!</h6></li>
                         <li><a class="dropdown-item rounded-2 mb-1" href="student-dashboard.html"><i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ của tôi</a></li>
-                        <li><a class="dropdown-item rounded-2 mb-1" href="student-dashboard.html"><i class="fas fa-history me-2 text-info"></i>Lịch sử mượn</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item rounded-2 text-danger fw-bold" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                     </ul>
                 </div>`;
         } else {
-            // --- TRẠNG THÁI: CHƯA ĐĂNG NHẬP (Style cho nền trắng) ---
             actionDiv.innerHTML = `
                 <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 fw-bold me-2">Đăng nhập</a>
                 <a href="register.html" class="btn btn-primary rounded-pill px-4 fw-bold text-white shadow-sm">Đăng ký</a>
@@ -194,37 +239,12 @@
         }
     }
 
-    // 2. HÀM ĐĂNG XUẤT (CÓ POPUP XÁC NHẬN)
     function logout() {
-        Swal.fire({
-            title: 'Đăng xuất?',
-            text: "Bạn có chắc muốn thoát phiên làm việc?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Đăng xuất',
-            cancelButtonText: 'Hủy'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('currentUser');
-                window.location.reload();
-            }
-        });
-    }
-    
-    // 3. LOGIC GỬI FORM LIÊN HỆ (RIÊNG CỦA TRANG CONTACT)
-    function submitContact(e) {
-        e.preventDefault();
-        Swal.fire({
-            icon: 'success',
-            title: 'Đã gửi!',
-            text: 'Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất.',
-            confirmButtonColor: '#00b4d8'
-        });
+        localStorage.removeItem('currentUser');
+        window.location.reload();
     }
 
-    // Tự động chạy khi tải trang
+    // Chạy khi load trang
     checkLoginState();
 </script>
 
