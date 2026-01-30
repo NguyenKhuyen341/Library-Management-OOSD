@@ -2,94 +2,132 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Liên Hệ - UniLib Admin</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* 1. Đồng bộ biến màu và layout với admin.html */
-        :root { --primary-color: #4f46e5; --sidebar-width: 260px; --bg-color: #f3f4f6; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); overflow-x: hidden; }
+        /* --- 1. Cấu hình chung --- */
+        :root {
+            --primary-color: #4f46e5;
+            --sidebar-width: 260px;
+            --bg-color: #f3f4f6;
+        }
+        
+        /* Box-sizing để tính toán kích thước chuẩn */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
-        /* Sidebar Style */
-        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0; background: white; border-right: 1px solid #e5e7eb; padding: 20px; z-index: 1000; }
-        .main-content { margin-left: var(--sidebar-width); padding: 30px; transition: 0.3s; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Chặn cuộn ngang toàn trang */
+        }
+
+        /* --- 2. Sidebar (Menu trái) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
         
         .nav-link { color: #64748b; padding: 12px 15px; border-radius: 10px; font-weight: 500; margin-bottom: 5px; display: flex; align-items: center; text-decoration: none; transition: 0.2s; }
         .nav-link:hover, .nav-link.active { background-color: #eef2ff; color: var(--primary-color); }
         .nav-link i { margin-right: 12px; width: 20px; text-align: center; }
         .brand-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 40px; display: flex; align-items: center; }
 
-        /* Table Container Style (Giống users.html) */
-        .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        /* --- 3. Main Content (Nội dung chính - ĐÃ SỬA LỖI) --- */
+        .main-content {
+            /* Đẩy nội dung sang phải bằng chiều rộng sidebar */
+            margin-left: var(--sidebar-width);
+            
+            /* Chiều rộng tự động lấp đầy phần còn lại */
+            width: auto;
+            
+            padding: 30px;
+            min-height: 100vh;
+        }
 
+        /* --- 4. Bảng và Danh sách --- */
         .table-container {
             background: white;
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow-x: auto; /* Cho phép cuộn ngang nếu màn hình quá nhỏ */
-        }
-
-        .table {
-            table-layout: fixed; /* Cố định cột */
             width: 100%;
-            margin-bottom: 0;
-            word-wrap: break-word; /* Thêm dòng này để an toàn cho các ô không dùng truncate */
+            overflow-x: auto; /* Cho phép cuộn ngang trong bảng nếu cần */
         }
+        .table { width: 100%; margin-bottom: 0; white-space: nowrap; }
 
-        /* Class cắt chữ thừa cho nội dung dài */
-        .text-truncate-custom {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: block;
-            max-width: 100%;
-        }
+        .text-truncate-custom { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 100%; }
 
-        /* Định nghĩa độ rộng các cột (Đã tinh chỉnh để vừa nút chữ) */
-        .col-id { width: 60px; }
-        .col-sender { width: 200px; }
-        .col-content { width: auto; } /* Cột này tự co giãn */
-        .col-date { width: 140px; }
-        .col-status { width: 130px; }
-        .col-action { width: 150px; } /* Tăng lên 150px để chứa đủ nút "Xem & Trả lời" */
-
-        /* Định nghĩa lại độ rộng chuẩn cho các cột */
+        /* Kích thước các cột */
         .col-id { width: 60px; }
         .col-sender { width: 20%; }
-        .col-content { width: auto; } /* Cột này sẽ co giãn linh hoạt */
+        .col-content { width: auto; }
         .col-date { width: 150px; }
         .col-status { width: 130px; }
         .col-action { width: 120px; }
         
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            min-width: 100px; /* Độ rộng tối thiểu cho badge */
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-align: center;
+        .status-badge { display: inline-block; min-width: 100px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-align: center; }
+        .status-pending { background-color: #fee2e2; color: #991b1b; }
+        .status-replied { background-color: #dcfce7; color: #166534; }
+        .table-hover tbody tr:hover { background-color: #f8fafc !important; cursor: pointer; }
+
+        /* --- 5. Chi tiết tin nhắn --- */
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            width: 100%;
+            animation: fadeIn 0.3s;
         }
-        .status-pending { background-color: #fee2e2; color: #991b1b; } /* Đỏ nhạt cho chờ xử lý */
-        .status-replied { background-color: #dcfce7; color: #166534; } /* Xanh lá cho đã trả lời */
-        .table-hover tbody tr:hover {
-            background-color: #f8fafc !important;
-        }
-        
-        /* View Chi Tiết */
-        .detail-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; animation: fadeIn 0.3s; }
+
         .detail-header { padding: 20px 30px; border-bottom: 1px solid #f1f5f9; background: #fff; }
         .detail-body { padding: 30px; }
-        .reply-area { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        
+        .reply-area {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .form-control { width: 100%; }
+
+        #detail-message {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 6. Responsive (Mobile/Tablet) --- */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+            .main-content { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
@@ -103,7 +141,7 @@
         <a class="nav-link" href="loans.html"><i class="fas fa-clipboard-list"></i> Mượn Trả</a>
         <a class="nav-link active" href="admin-contacts.html"><i class="fas fa-envelope"></i> Liên hệ</a>
         
-        <div style="margin-top: auto; padding-top: 100%;">
+        <div style="margin-top: auto; padding-top: 50px;">
             <a class="nav-link text-danger" href="index.html"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
         </div>
     </nav>
@@ -120,22 +158,22 @@
             <button class="btn btn-outline-primary fw-bold" onclick="loadContacts()"><i class="fas fa-sync-alt me-2"></i>Làm mới</button>
         </div>
 
-    <div class="table-container">
-        <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light text-secondary small text-uppercase">
-            <tr>
-                <th class="col-id">ID</th>
-                <th class="col-sender">Người gửi</th>
-                <th class="col-content">Nội dung tóm tắt</th>
-                <th class="col-date text-center">Ngày gửi</th>
-                <th class="col-status text-center">Trạng thái</th>
-                <th class="col-action text-end">Hành động</th>
-            </tr>
-        </thead>
-            <tbody id="contact-table-body">
-                </tbody>
-        </table>
-    </div>
+        <div class="table-container">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary small text-uppercase">
+                    <tr>
+                        <th class="col-id">ID</th>
+                        <th class="col-sender">Người gửi</th>
+                        <th class="col-content">Nội dung tóm tắt</th>
+                        <th class="col-date text-center">Ngày gửi</th>
+                        <th class="col-status text-center">Trạng thái</th>
+                        <th class="col-action text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="contact-table-body">
+                    </tbody>
+            </table>
+            
             <div id="empty-state" class="text-center py-5 d-none">
                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                 <p class="text-muted">Chưa có tin nhắn liên hệ nào.</p>
@@ -166,7 +204,7 @@
             <div class="detail-body">
                 <div class="mb-4">
                     <label class="small text-muted text-uppercase fw-bold mb-2">Nội dung tin nhắn:</label>
-                    <p class="fs-6 text-dark bg-light p-3 rounded" id="detail-message" style="line-height: 1.6; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">...</p>
+                    <p class="fs-6 text-dark bg-light p-3 rounded" id="detail-message">...</p>
                 </div>
 
                 <div class="reply-area">
@@ -194,11 +232,10 @@
 
     function formatDate(dateString) {
         if (!dateString) return '';
-        // Định dạng ngày giờ Việt Nam
         return new Date(dateString).toLocaleString('vi-VN');
     }
 
-    // 1. Tải danh sách liên hệ từ API
+    // --- API & Logic ---
     async function loadContacts() {
         try {
             const res = await fetch('/api/contacts');
@@ -218,28 +255,18 @@
                         ? `<span class="status-badge status-pending">Chờ xử lý</span>`
                         : `<span class="status-badge status-replied">Đã phản hồi</span>`;
                     
-                    // Cắt ngắn nội dung nếu quá dài
                     const summary = c.message.length > 60 ? c.message.substring(0, 60) + '...' : c.message;
 
-                    // Tạo avatar chữ cái đầu (giống users.html)
-                    const avatar = `<div class="bg-light rounded-circle text-primary fw-bold d-flex align-items-center justify-content-center me-2" style="width:35px; height:35px;">${c.fullName.charAt(0)}</div>`;
-
                     const row = `
-                        <tr style="cursor: pointer;" onclick="showDetail(${c.id})" class="align-middle">
+                        <tr onclick="showDetail(${c.id})">
                             <td class="text-muted fw-bold">#${c.id}</td>
-                            
                             <td>
                                 <div class="fw-bold text-dark text-truncate-custom">${c.fullName}</div>
                                 <div class="small text-muted text-truncate-custom">${c.email}</div>
                             </td>
-                            
-                            <td>
-                                <span class="text-secondary text-truncate-custom">${c.message}</span>
-                            </td>
-                            
+                            <td><span class="text-secondary text-truncate-custom">${summary}</span></td>
                             <td class="small text-center">${formatDate(c.createdDate)}</td>
                             <td class="text-center">${badge}</td>
-                            
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="event.stopPropagation(); showDetail(${c.id})">
                                     Chi tiết
@@ -250,16 +277,13 @@
                     tbody.innerHTML += row;
                 });
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Lỗi tải danh sách:', e); }
     }
 
-    // 2. Hiển thị chi tiết
     async function showDetail(id) {
         document.getElementById('list-view').style.display = 'none';
         document.getElementById('detail-view').style.display = 'block';
         currentContactId = id;
-
-        // Reset
         document.getElementById('reply-content').value = '';
 
         try {
@@ -272,7 +296,6 @@
                 document.getElementById('detail-email').innerText = contact.email;
                 document.getElementById('detail-date').innerText = formatDate(contact.createdDate);
                 document.getElementById('detail-message').innerText = contact.message;
-
                 if (contact.adminReply) {
                     document.getElementById('reply-content').value = contact.adminReply;
                 }
@@ -286,43 +309,33 @@
         loadContacts();
     }
 
-    // 3. Gửi phản hồi (API PUT)
     async function sendReply() {
         const replyText = document.getElementById('reply-content').value;
-        
         if (!replyText.trim()) {
             Swal.fire('Chưa nhập nội dung', 'Vui lòng viết câu trả lời trước khi gửi.', 'warning');
             return;
         }
 
         try {
-            // Gọi API PUT /{id}/reply đã viết ở Backend
             const res = await fetch(`/api/contacts/${currentContactId}/reply`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reply: replyText }) // Payload chứa nội dung phản hồi
+                body: JSON.stringify({ reply: replyText })
             });
 
             if (res.ok) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Đã lưu phản hồi!',
-                    text: 'Hệ thống đã ghi nhận câu trả lời của bạn.',
                     timer: 1500,
                     showConfirmButton: false
-                }).then(() => {
-                    showListView(); // Quay lại danh sách và tải lại dữ liệu mới
-                });
+                }).then(() => { showListView(); });
             } else {
-                Swal.fire('Lỗi', 'Không thể lưu phản hồi vào hệ thống.', 'error');
+                Swal.fire('Lỗi', 'Không thể lưu phản hồi.', 'error');
             }
-        } catch (e) {
-            console.error(e);
-            Swal.fire('Lỗi kết nối', 'Mất kết nối tới máy chủ.', 'error');
-        }
+        } catch (e) { Swal.fire('Lỗi kết nối', 'Mất kết nối server.', 'error'); }
     }
 
-    // 4. Xóa liên hệ (API DELETE)
     function deleteContact() {
         Swal.fire({
             title: 'Xóa tin nhắn này?',
@@ -337,14 +350,12 @@
                 try {
                     await fetch(`/api/contacts/${currentContactId}`, { method: 'DELETE' });
                     Swal.fire('Đã xóa', '', 'success').then(() => showListView());
-                } catch(e) {
-                    Swal.fire('Lỗi', 'Lỗi kết nối server', 'error');
-                }
+                } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối server', 'error'); }
             }
         });
     }
 
-    // Init
+    // Chạy khi tải trang
     loadContacts();
 </script>
 
