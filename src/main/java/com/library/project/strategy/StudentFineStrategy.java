@@ -2,7 +2,7 @@ package com.library.project.strategy;
 
 import org.springframework.stereotype.Component;
 
-@Component("STUDENT") // Key nhận diện là "STUDENT"
+@Component("STUDENT")
 public class StudentFineStrategy implements FineCalculationStrategy {
 
     @Override
@@ -10,7 +10,7 @@ public class StudentFineStrategy implements FineCalculationStrategy {
         if (overdueDays <= 0) {
             return 0;
         }
-        // Ví dụ: Sinh viên bị phạt 2.000đ mỗi ngày
-        return overdueDays * 2000;
+        // Phạt 5.000 VNĐ mỗi ngày (Ví dụ cập nhật giá)
+        return overdueDays * 5000;
     }
 }

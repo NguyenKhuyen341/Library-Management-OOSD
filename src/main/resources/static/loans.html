@@ -6,10 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
         :root { --primary-color: #4f46e5; --sidebar-width: 260px; --bg-color: #f3f4f6; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); }
@@ -20,13 +17,10 @@
         .nav-link i { margin-right: 12px; width: 20px; text-align: center; }
         .brand-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 40px; display: flex; align-items: center; }
         .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-
-        /* BADGE STATUS */
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .status-borrowing { background-color: #e0e7ff; color: #4338ca; } /* Xanh dương */
-        .status-returned { background-color: #dcfce7; color: #166534; } /* Xanh lá */
-        .status-pending { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; } /* Vàng (Mới) */
-
+        .status-borrowing { background-color: #e0e7ff; color: #4338ca; }
+        .status-returned { background-color: #dcfce7; color: #166534; }
+        .status-pending { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
         .stat-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -86,7 +80,7 @@
                 <th>Ngày hẹn/mượn</th>
                 <th>Hạn trả</th>
                 <th>Ngày trả</th>
-                <th>Trạng thái</th>
+                <th>Tiền phạt</th> <th>Trạng thái</th>
                 <th class="text-end">Hành động</th>
             </tr>
             </thead>
@@ -100,6 +94,12 @@
     function formatDate(dateString) {
         if (!dateString) return '---';
         return dateString;
+    }
+
+    // Hàm định dạng tiền tệ
+    function formatCurrency(amount) {
+        if (!amount || amount === 0) return '-';
+        return amount.toLocaleString('vi-VN') + ' đ';
     }
 
     async function loadLoans() {
@@ -116,6 +116,9 @@
                 let statusBadge = '';
                 let actionBtn = '';
                 let dateDisplay = loan.borrowDate;
+                
+                // Mặc định tiền phạt
+                let fineDisplay = formatCurrency(loan.fineAmount);
 
                 if (loan.status === 'PENDING') {
                     cPending++;
@@ -135,12 +138,14 @@
                     cReturned++;
                     statusBadge = `<span class="status-badge status-returned">Đã trả</span>`;
                     actionBtn = `<span class="text-muted small"><i class="fas fa-check"></i> Hoàn tất</span>`;
+                    
+                    // Nếu có phạt thì tô đỏ
+                    if (loan.fineAmount > 0) {
+                        fineDisplay = `<span class="text-danger fw-bold">${formatCurrency(loan.fineAmount)}</span>`;
+                    }
                 }
 
-                // --- LOGIC HIỂN THỊ NGÀY TRẢ ---
-                // Nếu có ngày trả (returnDate) thì hiện ngày đó, còn không thì hiện dấu gạch ngang (-)
                 const actualReturnDate = loan.returnDate ? formatDate(loan.returnDate) : '-';
-
                 const book = loan.book;
                 let coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random`;
                 if(book.image && book.image.trim() !== "") coverImg = `/images/${book.image}`;
@@ -159,11 +164,11 @@
                             </div>
                         </td>
                         <td>${formatDate(dateDisplay)}</td>
-                        
                         <td class="fw-bold text-danger">${formatDate(loan.dueDate)}</td>
-                        
                         <td class="fw-bold text-success">${actualReturnDate}</td>
                         
+                        <td>${fineDisplay}</td>
+
                         <td>${statusBadge}</td>
                         <td class="text-end">${actionBtn}</td>
                     </tr>
@@ -180,52 +185,44 @@
 
     function approveLoan(loanId, readerName) {
         Swal.fire({
-            title: 'Giao sách cho sinh viên?',
-            text: `Xác nhận ${readerName} đã đến nhận sách? Hạn trả (14 ngày) sẽ bắt đầu tính từ bây giờ.`,
+            title: 'Giao sách?',
+            text: `Xác nhận giao sách cho ${readerName}?`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#4f46e5',
-            confirmButtonText: 'Xác nhận giao'
+            confirmButtonText: 'Xác nhận'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                try {
-                    const res = await fetch(`/api/loans/approve/${loanId}`, { method: 'POST' });
-                    if (res.ok) {
-                        Swal.fire('Thành công', 'Đã giao sách!', 'success');
-                        loadLoans();
-                    } else {
-                        Swal.fire('Lỗi', await res.text(), 'error');
-                    }
-                } catch (e) { Swal.fire('Lỗi server', '', 'error'); }
+                await fetch(`/api/loans/approve/${loanId}`, { method: 'POST' });
+                loadLoans();
+                Swal.fire('Đã giao!', '', 'success');
             }
         });
     }
 
     function returnBook(loanId, bookTitle, readerName) {
         Swal.fire({
-            title: 'Xác nhận trả sách?',
-            html: `Độc giả: <b>${readerName}</b><br>Sách: <b>${bookTitle}</b>`,
+            title: 'Trả sách?',
+            html: `Xác nhận nhận lại sách <b>${bookTitle}</b> từ <b>${readerName}</b>?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#10b981',
-            confirmButtonText: 'Đồng ý, Đã nhận lại'
+            confirmButtonText: 'Đồng ý'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                try {
-                    const res = await fetch(`/api/loans/return/${loanId}`, { method: 'POST' });
-                    if (res.ok) {
-                        Swal.fire('Thành công!', 'Đã trả sách về kho.', 'success');
-                        loadLoans();
-                    } else {
-                        Swal.fire('Lỗi!', await res.text(), 'error');
-                    }
-                } catch (e) { Swal.fire('Lỗi!', 'Lỗi server', 'error'); }
+                const res = await fetch(`/api/loans/return/${loanId}`, { method: 'POST' });
+                if (res.ok) {
+                    // Hiển thị thông báo phạt nếu có (dựa trên phản hồi JSON nếu muốn nâng cao)
+                    loadLoans();
+                    Swal.fire('Hoàn tất!', 'Đã cập nhật kho và ngày trả.', 'success');
+                } else {
+                    Swal.fire('Lỗi', await res.text(), 'error');
+                }
             }
         });
     }
 
     function openLoanModal() {
-        Swal.fire('Thông báo', 'Admin vui lòng thao tác trên bảng bên dưới.', 'info');
+        Swal.fire('Thông báo', 'Chức năng này đang cập nhật...', 'info');
     }
 
     loadLoans();

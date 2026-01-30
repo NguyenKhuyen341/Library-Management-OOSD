@@ -21,10 +21,7 @@ public class LoanService {
 
     private final LoanRepository loanRepository;
     private final BookRepository bookRepository;
-    // 1. Thêm Repository này để lưu tiền phạt
     private final FineRepository fineRepository;
-
-    // 2. Map chứa các chiến lược tính phí (Spring tự tìm các file có @Component)
     private final Map<String, FineCalculationStrategy> fineStrategies;
 
     public LoanService(LoanRepository loanRepository,
@@ -37,7 +34,6 @@ public class LoanService {
         this.fineStrategies = fineStrategies;
     }
 
-    // --- Giữ nguyên hàm mượn sách ---
     @Transactional
     public Loan createLoan(Reader reader, Book book) {
         if (book.getAvailableQuantity() <= 0) {
@@ -50,13 +46,14 @@ public class LoanService {
         loan.setReader(reader);
         loan.setBook(book);
         loan.setBorrowDate(LocalDate.now());
-        loan.setDueDate(LocalDate.now().plusDays(14));
+        loan.setDueDate(LocalDate.now().plusDays(14)); // Mượn 14 ngày
         loan.setStatus("BORROWING");
+        loan.setFineAmount(0.0); // Mặc định chưa có phạt
 
         return loanRepository.save(loan);
     }
 
-    // --- CẬP NHẬT HÀM TRẢ SÁCH (QUAN TRỌNG) ---
+    // --- HÀM TRẢ SÁCH ĐÃ SỬA LOGIC ---
     @Transactional
     public Loan returnBook(Long loanId) {
         Loan loan = loanRepository.findById(loanId)
@@ -66,38 +63,35 @@ public class LoanService {
             throw new RuntimeException("Sách này đã được trả trước đó rồi!");
         }
 
-        // --- BẮT ĐẦU LOGIC TÍNH PHẠT MỚI ---
-        LocalDate returnDate = LocalDate.now(); // Ngày trả thực tế (Hôm nay)
+        LocalDate returnDate = LocalDate.now(); // Ngày trả là HÔM NAY
         
-        // Tính khoảng cách ngày: DueDate (Hạn) -> ReturnDate (Nay)
+        // 1. Tính toán quá hạn
         long overdueDays = ChronoUnit.DAYS.between(loan.getDueDate(), returnDate);
+        double fineAmount = 0.0;
 
         if (overdueDays > 0) {
-            // Lấy chiến lược tính phí cho "STUDENT"
-            // (Vì bạn chỉ làm cho sinh viên nên mình fix cứng luôn là STUDENT cho dễ)
+            // Sử dụng Strategy Pattern để tính tiền
             FineCalculationStrategy strategy = fineStrategies.get("STUDENT");
-
             if (strategy != null) {
-                double amount = strategy.calculateFine(overdueDays);
-
-                // Lưu phiếu phạt vào database
+                fineAmount = strategy.calculateFine(overdueDays);
+                
+                // Lưu vào bảng Fine (Lịch sử phạt chi tiết)
                 Fine fine = new Fine();
                 fine.setLoan(loan);
-                fine.setFineAmount(amount);
+                fine.setFineAmount(fineAmount);
                 fine.setReason("Quá hạn " + overdueDays + " ngày");
                 fine.setCreatedDate(returnDate);
-                fine.setStatus("UNPAID"); // Chưa thanh toán
-                
+                fine.setStatus("UNPAID");
                 fineRepository.save(fine);
-                
-                System.out.println("Đã phạt sinh viên: " + amount + " VND");
             }
         }
-        // --- KẾT THÚC LOGIC PHẠT ---
 
-        loan.setReturnDate(returnDate);
+        // 2. Cập nhật thông tin phiếu mượn
+        loan.setReturnDate(returnDate); // Quan trọng: Set đúng ngày trả thực tế
         loan.setStatus("RETURNED");
+        loan.setFineAmount(fineAmount); // Cập nhật tiền phạt vào đây để hiện lên bảng
 
+        // 3. Cộng lại kho sách
         Book book = loan.getBook();
         book.setAvailableQuantity(book.getAvailableQuantity() + 1);
         bookRepository.save(book);
@@ -105,7 +99,6 @@ public class LoanService {
         return loanRepository.save(loan);
     }
 
-    // --- Giữ nguyên các hàm lấy danh sách ---
     public List<Loan> getAllLoans() {
         return loanRepository.findAll();
     }
