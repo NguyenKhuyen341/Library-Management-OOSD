@@ -85,6 +85,7 @@
                 <th>Sách</th>
                 <th>Ngày hẹn/mượn</th>
                 <th>Hạn trả</th>
+                <th>Ngày trả</th>
                 <th>Trạng thái</th>
                 <th class="text-end">Hành động</th>
             </tr>
@@ -114,24 +115,21 @@
             loans.forEach(loan => {
                 let statusBadge = '';
                 let actionBtn = '';
-                let dateDisplay = loan.borrowDate; // Ngày hiển thị
+                let dateDisplay = loan.borrowDate;
 
-                // --- 1. LOGIC TRẠNG THÁI ---
                 if (loan.status === 'PENDING') {
                     cPending++;
                     statusBadge = `<span class="status-badge status-pending">Chờ lấy sách</span>`;
-                    // Nút Giao Sách
                     actionBtn = `<button class="btn btn-sm btn-primary fw-bold" onclick="approveLoan(${loan.id}, '${loan.reader.fullName}')">
                                     <i class="fas fa-check-double me-1"></i> Giao sách
-                                 </button>`;
+                                </button>`;
                 }
                 else if (loan.status === 'BORROWING') {
                     cBorrowing++;
                     statusBadge = `<span class="status-badge status-borrowing">Đang mượn</span>`;
-                    // Nút Trả Sách
                     actionBtn = `<button class="btn btn-sm btn-outline-success fw-bold" onclick="returnBook(${loan.id}, '${loan.book.title}', '${loan.reader.fullName}')">
                                     <i class="fas fa-undo me-1"></i> Trả sách
-                                 </button>`;
+                                </button>`;
                 }
                 else {
                     cReturned++;
@@ -139,7 +137,10 @@
                     actionBtn = `<span class="text-muted small"><i class="fas fa-check"></i> Hoàn tất</span>`;
                 }
 
-                // --- 2. LOGIC ẢNH THẬT ---
+                // --- LOGIC HIỂN THỊ NGÀY TRẢ ---
+                // Nếu có ngày trả (returnDate) thì hiện ngày đó, còn không thì hiện dấu gạch ngang (-)
+                const actualReturnDate = loan.returnDate ? formatDate(loan.returnDate) : '-';
+
                 const book = loan.book;
                 let coverImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.title)}&background=random`;
                 if(book.image && book.image.trim() !== "") coverImg = `/images/${book.image}`;
@@ -158,7 +159,11 @@
                             </div>
                         </td>
                         <td>${formatDate(dateDisplay)}</td>
-                        <td class="fw-bold">${formatDate(loan.dueDate)}</td>
+                        
+                        <td class="fw-bold text-danger">${formatDate(loan.dueDate)}</td>
+                        
+                        <td class="fw-bold text-success">${actualReturnDate}</td>
+                        
                         <td>${statusBadge}</td>
                         <td class="text-end">${actionBtn}</td>
                     </tr>
@@ -166,7 +171,6 @@
                 tbody.innerHTML += row;
             });
 
-            // Cập nhật thống kê
             document.getElementById('count-pending').innerText = cPending;
             document.getElementById('count-borrowing').innerText = cBorrowing;
             document.getElementById('count-returned').innerText = cReturned;
@@ -174,7 +178,6 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- HÀM 1: GIAO SÁCH (DUYỆT PENDING -> BORROWING) ---
     function approveLoan(loanId, readerName) {
         Swal.fire({
             title: 'Giao sách cho sinh viên?',
@@ -198,7 +201,6 @@
         });
     }
 
-    // --- HÀM 2: TRẢ SÁCH (BORROWING -> RETURNED) ---
     function returnBook(loanId, bookTitle, readerName) {
         Swal.fire({
             title: 'Xác nhận trả sách?',

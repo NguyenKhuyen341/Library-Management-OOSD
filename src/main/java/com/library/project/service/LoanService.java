@@ -1,50 +1,62 @@
 package com.library.project.service;
 
 import com.library.project.entity.Book;
+import com.library.project.entity.Fine;
 import com.library.project.entity.Loan;
 import com.library.project.entity.Reader;
 import com.library.project.repository.BookRepository;
+import com.library.project.repository.FineRepository;
 import com.library.project.repository.LoanRepository;
+import com.library.project.strategy.FineCalculationStrategy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List; // Thêm thư viện này để dùng List ngắn gọn
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class LoanService {
 
     private final LoanRepository loanRepository;
     private final BookRepository bookRepository;
+    // 1. Thêm Repository này để lưu tiền phạt
+    private final FineRepository fineRepository;
 
-    public LoanService(LoanRepository loanRepository, BookRepository bookRepository) {
+    // 2. Map chứa các chiến lược tính phí (Spring tự tìm các file có @Component)
+    private final Map<String, FineCalculationStrategy> fineStrategies;
+
+    public LoanService(LoanRepository loanRepository,
+                    BookRepository bookRepository,
+                    FineRepository fineRepository,
+                    Map<String, FineCalculationStrategy> fineStrategies) {
         this.loanRepository = loanRepository;
         this.bookRepository = bookRepository;
+        this.fineRepository = fineRepository;
+        this.fineStrategies = fineStrategies;
     }
 
-    // 1. Nghiệp vụ Mượn sách
+    // --- Giữ nguyên hàm mượn sách ---
     @Transactional
     public Loan createLoan(Reader reader, Book book) {
         if (book.getAvailableQuantity() <= 0) {
             throw new RuntimeException("Sách đã hết trong kho!");
         }
-
-        // Trừ số lượng sách còn lại
         book.setAvailableQuantity(book.getAvailableQuantity() - 1);
         bookRepository.save(book);
 
-        // Tạo phiếu mượn
         Loan loan = new Loan();
         loan.setReader(reader);
         loan.setBook(book);
         loan.setBorrowDate(LocalDate.now());
-        loan.setDueDate(LocalDate.now().plusDays(14)); // Mặc định cho mượn 14 ngày
+        loan.setDueDate(LocalDate.now().plusDays(14));
         loan.setStatus("BORROWING");
 
         return loanRepository.save(loan);
     }
 
-    // 2. Nghiệp vụ Trả sách
+    // --- CẬP NHẬT HÀM TRẢ SÁCH (QUAN TRỌNG) ---
     @Transactional
     public Loan returnBook(Long loanId) {
         Loan loan = loanRepository.findById(loanId)
@@ -54,11 +66,38 @@ public class LoanService {
             throw new RuntimeException("Sách này đã được trả trước đó rồi!");
         }
 
-        // Cập nhật ngày trả và trạng thái
-        loan.setReturnDate(LocalDate.now());
+        // --- BẮT ĐẦU LOGIC TÍNH PHẠT MỚI ---
+        LocalDate returnDate = LocalDate.now(); // Ngày trả thực tế (Hôm nay)
+        
+        // Tính khoảng cách ngày: DueDate (Hạn) -> ReturnDate (Nay)
+        long overdueDays = ChronoUnit.DAYS.between(loan.getDueDate(), returnDate);
+
+        if (overdueDays > 0) {
+            // Lấy chiến lược tính phí cho "STUDENT"
+            // (Vì bạn chỉ làm cho sinh viên nên mình fix cứng luôn là STUDENT cho dễ)
+            FineCalculationStrategy strategy = fineStrategies.get("STUDENT");
+
+            if (strategy != null) {
+                double amount = strategy.calculateFine(overdueDays);
+
+                // Lưu phiếu phạt vào database
+                Fine fine = new Fine();
+                fine.setLoan(loan);
+                fine.setFineAmount(amount);
+                fine.setReason("Quá hạn " + overdueDays + " ngày");
+                fine.setCreatedDate(returnDate);
+                fine.setStatus("UNPAID"); // Chưa thanh toán
+                
+                fineRepository.save(fine);
+                
+                System.out.println("Đã phạt sinh viên: " + amount + " VND");
+            }
+        }
+        // --- KẾT THÚC LOGIC PHẠT ---
+
+        loan.setReturnDate(returnDate);
         loan.setStatus("RETURNED");
 
-        // Cộng lại số lượng sách vào kho
         Book book = loan.getBook();
         book.setAvailableQuantity(book.getAvailableQuantity() + 1);
         bookRepository.save(book);
@@ -66,14 +105,12 @@ public class LoanService {
         return loanRepository.save(loan);
     }
 
-    // 3. Lấy tất cả phiếu mượn (Cho Admin)
+    // --- Giữ nguyên các hàm lấy danh sách ---
     public List<Loan> getAllLoans() {
         return loanRepository.findAll();
     }
 
-    // 4. Lấy phiếu mượn theo ID độc giả (Cho Sinh viên) -> HÀM NÀY PHẢI NẰM TRONG CLASS
     public List<Loan> getLoansByReaderId(Long readerId) {
         return loanRepository.findByReaderId(readerId);
     }
-
 }

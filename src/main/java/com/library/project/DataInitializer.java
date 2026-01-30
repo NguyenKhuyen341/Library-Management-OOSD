@@ -14,8 +14,8 @@ public class DataInitializer implements CommandLineRunner {
     private final AuthorRepository authorRepository;
 
     public DataInitializer(ReaderRepository readerRepository,
-                           BookRepository bookRepository,
-                           AuthorRepository authorRepository) {
+                        BookRepository bookRepository,
+                        AuthorRepository authorRepository) {
         this.readerRepository = readerRepository;
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
@@ -85,6 +85,9 @@ public class DataInitializer implements CommandLineRunner {
             r.setPassword(pass);
             r.setFullName(fullname);
             r.setReaderCode(code);
+            readerRepository.save(r);
+            r.setMembershipClass("STUDENT");
+            
             readerRepository.save(r);
         }
     }
