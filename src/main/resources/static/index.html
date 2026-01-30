@@ -174,7 +174,7 @@
         if (e.key === 'Enter') doSearch();
     });
 
-   async function fetchBooks(keyword = '') {
+    async function fetchBooks(keyword = '') {
         const listDiv = document.getElementById('book-list');
         // Hiển thị loading
         listDiv.innerHTML = `
@@ -273,9 +273,9 @@
             // Xử lý nút bấm (nếu tìm thấy nút)
             let originalText = "";
             if(btn) {
-                 originalText = btn.innerHTML;
-                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Xử lý...';
-                 btn.disabled = true;
+                originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Xử lý...';
+                btn.disabled = true;
             }
 
             try {
