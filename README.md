@@ -10,19 +10,19 @@
 - Database: MySQL
 
 3. Hướng dẫn cài đặt & Chạy
-1. Cấu hình Database:
-   - Mở MySQL Workbench hoặc phpMyAdmin.
-   - Tạo database mới tên là: `library_db` (CREATE DATABASE library_db;).
-   - Lưu ý: Kiểm tra file `src/main/resources/application.properties` để chỉnh sửa username/password MySQL cho khớp với máy.
+   1. Cấu hình Database:
+      - Mở MySQL Workbench hoặc phpMyAdmin.
+      - Tạo database mới tên là: `library_db` (CREATE DATABASE library_db;).
+      - Lưu ý: Kiểm tra file `src/main/resources/application.properties` để chỉnh sửa username/password MySQL cho khớp với máy.
 
-2. Chạy ứng dụng:
-   - Mở project bằng IntelliJ IDEA hoặc Eclipse.
-   - Chạy file: `src/main/java/com/library/project/LibraryApplication.java`
+   2. Chạy ứng dụng:
+      - Mở project bằng IntelliJ IDEA hoặc Eclipse.
+      - Chạy file: `src/main/java/com/library/project/LibraryApplication.java`
 
-3. Tài khoản Demo:
-   - Hệ thống sẽ tự động nạp dữ liệu mẫu khi chạy lần đầu.
-   - Admin: username: `admin` / password: `123`
-   - Sinh viên: username: `reader01` / password: `123`
+   3. Tài khoản Demo:
+      - Hệ thống sẽ tự động nạp dữ liệu mẫu khi chạy lần đầu.
+      - Admin: username: `admin` / password: `123`
+      - Sinh viên: username: `reader01` / password: `123`
 
 4. Các tính năng chính
 - Quản lý sách (Thêm, sửa, xóa, upload ảnh).
